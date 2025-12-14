@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drozast - Panel de Servicios</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 15px; }
+        header { text-align: center; padding: 15px 0; border-bottom: 1px solid #ffffff20; margin-bottom: 20px; }
+        header h1 { font-size: 1.8em; margin-bottom: 5px; }
+        header p { color: #888; font-size: 0.85em; }
+        
+        /* Stats Panel */
+        .stats-panel { background: #ffffff08; border-radius: 10px; padding: 12px; margin-bottom: 20px; border: 1px solid #ffffff10; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+        .stat-item { text-align: center; padding: 8px; background: #ffffff05; border-radius: 8px; }
+        .stat-icon { font-size: 1.2em; }
+        .stat-value { font-size: 1.1em; font-weight: bold; color: #4fc3f7; }
+        .stat-label { font-size: 0.65em; color: #888; }
+        .stat-bar { height: 4px; background: #ffffff20; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+        .stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+        .stat-bar-fill.cpu { background: linear-gradient(90deg, #4caf50, #ff9800, #f44336); }
+        .stat-bar-fill.ram { background: #2196f3; }
+        .stat-bar-fill.disk { background: #9c27b0; }
+        
+        /* Server Controls */
+        .controls { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .btn-control { padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.7em; font-weight: bold; transition: transform 0.2s; }
+        .btn-control:hover { transform: scale(1.05); }
+        .btn-restart { background: #ff9800; color: #000; }
+        .btn-force { background: #f44336; color: #fff; }
+        .btn-refresh { background: #4caf50; color: #fff; }
+        
+        /* Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+        .card { background: #ffffff10; border-radius: 10px; padding: 12px; transition: transform 0.2s, background 0.2s; border: 1px solid #ffffff10; text-align: center; }
+        .card:hover { transform: translateY(-3px); background: #ffffff20; }
+        .card-icon { font-size: 1.5em; margin-bottom: 6px; }
+        .card h3 { font-size: 0.8em; margin-bottom: 4px; color: #4fc3f7; }
+        .card p { color: #888; font-size: 0.65em; margin-bottom: 8px; }
+        .card a { display: inline-block; background: #4fc3f7; color: #1a1a2e; padding: 4px 10px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.65em; }
+        .card a:hover { background: #81d4fa; }
+        .card .url { display: block; color: #555; font-size: 0.55em; margin-top: 6px; }
+        .category { margin-bottom: 20px; }
+        .category h2 { font-size: 0.9em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #4fc3f7; color: #4fc3f7; }
+        .status { display: inline-block; width: 6px; height: 6px; background: #4caf50; border-radius: 50%; margin-right: 4px; }
+        .badge { display: inline-block; background: #4caf50; color: #fff; padding: 1px 4px; border-radius: 6px; font-size: 0.5em; margin-left: 3px; }
+        footer { text-align: center; padding: 15px 0; border-top: 1px solid #ffffff20; margin-top: 15px; color: #666; font-size: 0.75em; }
+        footer a { color: #4fc3f7; text-decoration: none; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #1a1a2e; padding: 20px; border-radius: 10px; text-align: center; }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-content button { margin: 5px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Drozast Server</h1>
+            <p id="server-time">Cargando...</p>
+        </header>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">💻</div>
+                    <div class="stat-value" id="cpu-usage">--%</div>
+                    <div class="stat-label">CPU</div>
+                    <div class="stat-bar"><div class="stat-bar-fill cpu" id="cpu-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🧠</div>
+                    <div class="stat-value" id="ram-usage">--%</div>
+                    <div class="stat-label">RAM <span id="ram-detail"></span></div>
+                    <div class="stat-bar"><div class="stat-bar-fill ram" id="ram-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💾</div>
+                    <div class="stat-value" id="disk-usage">--%</div>
+                    <div class="stat-label">Disco Root</div>
+                    <div class="stat-bar"><div class="stat-bar-fill disk" id="disk-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📀</div>
+                    <div class="stat-value" id="disk-data">--%</div>
+                    <div class="stat-label">Datos <span id="disk-data-free"></span></div>
+                    <div class="stat-bar"><div class="stat-bar-fill disk" id="disk-data-bar" style="width: 0%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🌡️</div>
+                    <div class="stat-value" id="cpu-temp">--°C</div>
+                    <div class="stat-label">Temp CPU</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-value" id="uptime">--</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🐳</div>
+                    <div class="stat-value" id="docker">--</div>
+                    <div class="stat-label">Containers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📥</div>
+                    <div class="stat-value" id="net-rx">-- GB</div>
+                    <div class="stat-label">Download</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-value" id="net-tx">-- GB</div>
+                    <div class="stat-label">Upload</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-value" id="power">-- W</div>
+                    <div class="stat-label">Consumo</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="energy-cost">$--</div>
+                    <div class="stat-label">Costo (<span id="kwh">--</span> kWh)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🔌</div>
+                    <div class="stat-value" id="connections">--</div>
+                    <div class="stat-label">Conexiones</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn-control btn-refresh" onclick="fetchStats()">🔄 Actualizar</button>
+                <button class="btn-control btn-restart" onclick="confirmRestart('restart')">🔄 Reiniciar</button>
+                <button class="btn-control btn-force" onclick="confirmRestart('force')">⚠️ Forzar Reinicio</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🐸 FROGIO - Gestión Municipal</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">🔧</div><h3><span class="status"></span>API Backend <span class="badge">NEW</span></h3><p>Node.js + Express</p><a href="https://api.drozast.xyz/health" target="_blank">Estado →</a><span class="url">api.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">🔔</div><h3><span class="status"></span>Notificaciones</h3><p>Push (ntfy)</p><a href="https://ntfy.drozast.xyz" target="_blank">Abrir →</a><span class="url">ntfy.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">📦</div><h3><span class="status"></span>MinIO</h3><p>Storage S3</p><a href="https://minio.drozast.xyz" target="_blank">Abrir →</a><span class="url">minio.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🍽️ Restaurant Mise en Place</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">🍽️</div><h3><span class="status"></span>Mise en Place</h3><p>Gestión restaurantes</p><a href="https://miseenplace.drozast.xyz" target="_blank">Abrir →</a><span class="url">miseenplace.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>☁️ Almacenamiento</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">☁️</div><h3><span class="status"></span>Nextcloud</h3><p>Archivos nube</p><a href="https://cloud.drozast.xyz" target="_blank">Abrir →</a><span class="url">cloud.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">📄</div><h3><span class="status"></span>Stirling PDF</h3><p>Herramientas PDF</p><a href="https://pdf.drozast.xyz" target="_blank">Abrir →</a><span class="url">pdf.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🎬 Multimedia</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">🎵</div><h3><span class="status"></span>Navidrome</h3><p>Música</p><a href="https://music.drozast.xyz" target="_blank">Abrir →</a><span class="url">music.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">📚</div><h3><span class="status"></span>Kavita</h3><p>Libros/Manga</p><a href="https://books.drozast.xyz" target="_blank">Abrir →</a><span class="url">books.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">📹</div><h3><span class="status"></span>MeTube</h3><p>Videos</p><a href="https://videos.drozast.xyz" target="_blank">Abrir →</a><span class="url">videos.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>⚙️ Administración</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">🚀</div><h3><span class="status"></span>Coolify</h3><p>Deploy Git</p><a href="https://coolify.drozast.xyz" target="_blank">Abrir →</a><span class="url">coolify.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">🐳</div><h3><span class="status"></span>Portainer</h3><p>Docker</p><a href="https://portainer.drozast.xyz" target="_blank">Abrir →</a><span class="url">portainer.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">🌐</div><h3><span class="status"></span>Pi-hole</h3><p>DNS</p><a href="https://pihole.drozast.xyz" target="_blank">Abrir →</a><span class="url">pihole.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">🔀</div><h3><span class="status"></span>Nginx</h3><p>Proxy</p><a href="https://proxy.drozast.xyz" target="_blank">Abrir →</a><span class="url">proxy.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🔐 Seguridad</h2>
+            <div class="grid">
+                <div class="card"><div class="card-icon">🔑</div><h3><span class="status"></span>Vaultwarden</h3><p>Contraseñas</p><a href="https://vault.drozast.xyz" target="_blank">Abrir →</a><span class="url">vault.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">🔗</div><h3><span class="status"></span>Shlink</h3><p>URLs cortas</p><a href="https://qr.drozast.xyz" target="_blank">Abrir →</a><span class="url">qr.drozast.xyz</span></div>
+                <div class="card"><div class="card-icon">📊</div><h3><span class="status"></span>Shlink Admin</h3><p>Panel URLs</p><a href="https://qr-admin.drozast.xyz" target="_blank">Abrir →</a><span class="url">qr-admin.drozast.xyz</span></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Drozast Server • Debian + Docker • <a href="https://coolify.drozast.xyz">Coolify</a> • Actualización cada 5s</p>
+        </footer>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal" id="restartModal">
+        <div class="modal-content">
+            <h3 id="modal-title">¿Reiniciar servidor?</h3>
+            <p id="modal-text">Esta acción reiniciará el servidor.</p>
+            <button onclick="executeRestart()" style="background:#f44336;color:#fff;">Confirmar</button>
+            <button onclick="closeModal()" style="background:#666;color:#fff;">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        let restartType = '';
+        
+        async function fetchStats() {
+            try {
+                const res = await fetch('https://stats.drozast.xyz/');
+                const data = await res.json();
+                
+                // CPU
+                document.getElementById('cpu-usage').textContent = data.cpu.usage + '%';
+                document.getElementById('cpu-bar').style.width = data.cpu.usage + '%';
+                document.getElementById('cpu-temp').textContent = data.cpu.temp + '°C';
+                
+                // RAM
+                document.getElementById('ram-usage').textContent = data.ram.percent + '%';
+                document.getElementById('ram-bar').style.width = data.ram.percent + '%';
+                document.getElementById('ram-detail').textContent = `(${Math.round(data.ram.used_mb/1024)}/${Math.round(data.ram.total_mb/1024)}GB)`;
+                
+                // Disco Root
+                document.getElementById('disk-usage').textContent = data.disk.root.percent + '%';
+                document.getElementById('disk-bar').style.width = data.disk.root.percent + '%';
+                
+                // Disco Data
+                document.getElementById('disk-data').textContent = data.disk.data.percent + '%';
+                document.getElementById('disk-data-bar').style.width = data.disk.data.percent + '%';
+                document.getElementById('disk-data-free').textContent = `(${data.disk.data.free} libre)`;
+                
+                // Uptime
+                let uptime = '';
+                if (data.uptime.days > 0) uptime += data.uptime.days + 'd ';
+                uptime += data.uptime.hours + 'h ' + data.uptime.minutes + 'm';
+                document.getElementById('uptime').textContent = uptime;
+                
+                // Docker
+                document.getElementById('docker').textContent = data.docker.running + '/' + data.docker.total;
+                
+                // Network
+                document.getElementById('net-rx').textContent = data.network.rx_gb + ' GB';
+                document.getElementById('net-tx').textContent = data.network.tx_gb + ' GB';
+                document.getElementById('connections').textContent = data.network.connections;
+                
+                // Energy
+                document.getElementById('power').textContent = data.energy.watts + ' W';
+                document.getElementById('kwh').textContent = data.energy.kwh;
+                document.getElementById('energy-cost').textContent = '$' + data.energy.cost_clp + ' CLP';
+                
+                // Time
+                document.getElementById('server-time').textContent = '🟢 Online • ' + data.timestamp;
+                
+            } catch (e) {
+                document.getElementById('server-time').textContent = '🔴 Error conexión';
+            }
+        }
+        
+        function confirmRestart(type) {
+            restartType = type;
+            document.getElementById('modal-title').textContent = type === 'force' ? '⚠️ ¿Forzar reinicio?' : '🔄 ¿Reiniciar servidor?';
+            document.getElementById('modal-text').textContent = type === 'force' ? 
+                'Esto forzará un reinicio inmediato. Los datos no guardados se perderán.' : 
+                'El servidor se reiniciará de forma segura.';
+            document.getElementById('restartModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('restartModal').style.display = 'none';
+        }
+        
+        async function executeRestart() {
+            closeModal();
+            alert('Función de reinicio deshabilitada por seguridad.\n\nUsa SSH: sudo reboot');
+        }
+        
+        // Actualizar cada 5 segundos
+        fetchStats();
+        setInterval(fetchStats, 5000);
+    </script>
+</body>
+</html>
