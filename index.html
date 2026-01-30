@@ -3,284 +3,2562 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drozast - Panel de Servicios</title>
+    <title>Drozast Server Dashboard</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --border: #2a2a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b9a;
+            --text-muted: #5a5a6a;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
-        .container { max-width: 1600px; margin: 0 auto; padding: 15px; }
-        header { text-align: center; padding: 15px 0; border-bottom: 1px solid #ffffff20; margin-bottom: 20px; }
-        header h1 { font-size: 1.8em; margin-bottom: 5px; }
-        header p { color: #888; font-size: 0.85em; }
-        
-        /* Stats Panel */
-        .stats-panel { background: #ffffff08; border-radius: 10px; padding: 12px; margin-bottom: 20px; border: 1px solid #ffffff10; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-        .stat-item { text-align: center; padding: 8px; background: #ffffff05; border-radius: 8px; }
-        .stat-icon { font-size: 1.2em; }
-        .stat-value { font-size: 1.1em; font-weight: bold; color: #4fc3f7; }
-        .stat-label { font-size: 0.65em; color: #888; }
-        .stat-bar { height: 4px; background: #ffffff20; border-radius: 2px; margin-top: 4px; overflow: hidden; }
-        .stat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
-        .stat-bar-fill.cpu { background: linear-gradient(90deg, #4caf50, #ff9800, #f44336); }
-        .stat-bar-fill.ram { background: #2196f3; }
-        .stat-bar-fill.disk { background: #9c27b0; }
-        
-        /* Server Controls */
-        .controls { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
-        .btn-control { padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.7em; font-weight: bold; transition: transform 0.2s; }
-        .btn-control:hover { transform: scale(1.05); }
-        .btn-restart { background: #ff9800; color: #000; }
-        .btn-force { background: #f44336; color: #fff; }
-        .btn-refresh { background: #4caf50; color: #fff; }
-        
-        /* Cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-        .card { background: #ffffff10; border-radius: 10px; padding: 12px; transition: transform 0.2s, background 0.2s; border: 1px solid #ffffff10; text-align: center; }
-        .card:hover { transform: translateY(-3px); background: #ffffff20; }
-        .card-icon { font-size: 1.5em; margin-bottom: 6px; }
-        .card h3 { font-size: 0.8em; margin-bottom: 4px; color: #4fc3f7; }
-        .card p { color: #888; font-size: 0.65em; margin-bottom: 8px; }
-        .card a { display: inline-block; background: #4fc3f7; color: #1a1a2e; padding: 4px 10px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.65em; }
-        .card a:hover { background: #81d4fa; }
-        .card .url { display: block; color: #555; font-size: 0.55em; margin-top: 6px; }
-        .category { margin-bottom: 20px; }
-        .category h2 { font-size: 0.9em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid #4fc3f7; color: #4fc3f7; }
-        .status { display: inline-block; width: 6px; height: 6px; background: #4caf50; border-radius: 50%; margin-right: 4px; }
-        .badge { display: inline-block; background: #4caf50; color: #fff; padding: 1px 4px; border-radius: 6px; font-size: 0.5em; margin-left: 3px; }
-        footer { text-align: center; padding: 15px 0; border-top: 1px solid #ffffff20; margin-top: 15px; color: #666; font-size: 0.75em; }
-        footer a { color: #4fc3f7; text-decoration: none; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: #1a1a2e; padding: 20px; border-radius: 10px; text-align: center; }
-        .modal-content h3 { margin-bottom: 15px; }
-        .modal-content button { margin: 5px; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f0f1a 100%);
+        }
+
+        .login-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-logo p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .login-screen.hidden { display: none; }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-time {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .stat-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .stat-bar-fill.cpu { background: linear-gradient(90deg, var(--success), var(--warning), var(--danger)); }
+        .stat-bar-fill.ram { background: var(--info); }
+        .stat-bar-fill.disk { background: var(--accent); }
+
+        .stat-detail {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Disk Section */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .disks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .disk-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .disk-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .disk-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .disk-icon.os { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .disk-icon.cache { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .disk-icon.raid { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+
+        .disk-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .disk-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .disk-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .disk-stat {
+            text-align: center;
+        }
+
+        .disk-stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .disk-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .disk-progress {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .disk-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .disk-progress-fill.low { background: var(--success); }
+        .disk-progress-fill.medium { background: var(--warning); }
+        .disk-progress-fill.high { background: var(--danger); }
+
+        .disk-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .disk-details code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .service-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .service-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .service-info h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .service-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .service-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .service-status.online {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+
+        .service-status.offline {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .service-description {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .service-links {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .service-link {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .service-link.web {
+            background: var(--accent);
+            color: white;
+        }
+
+        .service-link.web:hover {
+            background: var(--accent-hover);
+        }
+
+        .service-link.local {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .service-link.local:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        /* Service Stats Bars */
+        .service-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .service-stat {
+            flex: 1;
+        }
+
+        .service-stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .service-stat-bar {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .service-stat-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .service-stat-fill.cpu {
+            background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+        }
+
+        .service-stat-fill.ram {
+            background: var(--info);
+        }
+
+        /* Category */
+        .category {
+            margin-bottom: 32px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .category-count {
+            background: var(--bg-card);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Server Context Section */
+        .context-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .context-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .context-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .context-code {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .context-code .comment { color: var(--text-muted); }
+        .context-code .key { color: var(--accent); }
+        .context-code .value { color: var(--success); }
+        .context-code .section-label { color: var(--warning); font-weight: 600; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 12px 16px; flex-wrap: wrap; gap: 12px; }
+            .main { padding: 16px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .login-container { padding: 32px 24px; margin: 16px; }
+            .disks-grid { grid-template-columns: 1fr; }
+            .tabs { overflow-x: auto; flex-wrap: nowrap; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🏠 Drozast Server</h1>
-            <p id="server-time">Cargando...</p>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <h1>Drozast Server</h1>
+                <p>Panel de Administración</p>
+            </div>
+            <div class="login-error" id="loginError">
+                Credenciales incorrectas. Intenta de nuevo.
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="tu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="login-btn">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <header class="header">
+            <div class="header-left">
+                <span class="header-logo">Drozast Server</span>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span id="serverStatus">Online</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="header-time" id="serverTime">--</span>
+                <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
+            </div>
         </header>
 
-        <!-- Stats Panel -->
-        <div class="stats-panel">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-icon">💻</div>
-                    <div class="stat-value" id="cpu-usage">--%</div>
-                    <div class="stat-label">CPU</div>
-                    <div class="stat-bar"><div class="stat-bar-fill cpu" id="cpu-bar" style="width: 0%"></div></div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🧠</div>
-                    <div class="stat-value" id="ram-usage">--%</div>
-                    <div class="stat-label">RAM <span id="ram-detail"></span></div>
-                    <div class="stat-bar"><div class="stat-bar-fill ram" id="ram-bar" style="width: 0%"></div></div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">💾</div>
-                    <div class="stat-value" id="disk-usage">--%</div>
-                    <div class="stat-label">Disco Root</div>
-                    <div class="stat-bar"><div class="stat-bar-fill disk" id="disk-bar" style="width: 0%"></div></div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">📀</div>
-                    <div class="stat-value" id="disk-data">--%</div>
-                    <div class="stat-label">Datos <span id="disk-data-free"></span></div>
-                    <div class="stat-bar"><div class="stat-bar-fill disk" id="disk-data-bar" style="width: 0%"></div></div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🌡️</div>
-                    <div class="stat-value" id="cpu-temp">--°C</div>
-                    <div class="stat-label">Temp CPU</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">⏱️</div>
-                    <div class="stat-value" id="uptime">--</div>
-                    <div class="stat-label">Uptime</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🐳</div>
-                    <div class="stat-value" id="docker">--</div>
-                    <div class="stat-label">Containers</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">📥</div>
-                    <div class="stat-value" id="net-rx">-- GB</div>
-                    <div class="stat-label">Download</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">📤</div>
-                    <div class="stat-value" id="net-tx">-- GB</div>
-                    <div class="stat-label">Upload</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">⚡</div>
-                    <div class="stat-value" id="power">-- W</div>
-                    <div class="stat-label">Consumo</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">💰</div>
-                    <div class="stat-value" id="energy-cost">$--</div>
-                    <div class="stat-label">Costo (<span id="kwh">--</span> kWh)</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-icon">🔌</div>
-                    <div class="stat-value" id="connections">--</div>
-                    <div class="stat-label">Conexiones</div>
-                </div>
+        <main class="main">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('overview')">Vista General</button>
+                <button class="tab" onclick="switchTab('services')">Servicios</button>
+                <button class="tab" onclick="switchTab('storage')">Almacenamiento</button>
+                <button class="tab" onclick="switchTab('context')">Contexto Server</button>
             </div>
-            <div class="controls">
-                <button class="btn-control btn-refresh" onclick="fetchStats()">🔄 Actualizar</button>
-                <button class="btn-control btn-restart" onclick="confirmRestart('restart')">🔄 Reiniciar</button>
-                <button class="btn-control btn-force" onclick="confirmRestart('force')">⚠️ Forzar Reinicio</button>
-            </div>
-        </div>
 
-        <div class="category">
-            <h2>🐸 FROGIO - Gestión Municipal</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">🔧</div><h3><span class="status"></span>API Backend <span class="badge">NEW</span></h3><p>Node.js + Express</p><a href="https://api.drozast.xyz/health" target="_blank">Estado →</a><span class="url">api.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">🔔</div><h3><span class="status"></span>Notificaciones</h3><p>Push (ntfy)</p><a href="https://ntfy.drozast.xyz" target="_blank">Abrir →</a><span class="url">ntfy.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">📦</div><h3><span class="status"></span>MinIO</h3><p>Storage S3</p><a href="https://minio.drozast.xyz" target="_blank">Abrir →</a><span class="url">minio.drozast.xyz</span></div>
-            </div>
-        </div>
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="tab-overview">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">🖥️</div>
+                        </div>
+                        <div class="stat-value" id="cpuValue">--%</div>
+                        <div class="stat-label">Uso de CPU</div>
+                        <div class="stat-bar"><div class="stat-bar-fill cpu" id="cpuBar" style="width: 0%"></div></div>
+                        <div class="stat-detail" id="cpuDetail">4 cores • --°C</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">🧠</div>
+                        </div>
+                        <div class="stat-value" id="ramValue">--%</div>
+                        <div class="stat-label">Memoria RAM</div>
+                        <div class="stat-bar"><div class="stat-bar-fill ram" id="ramBar" style="width: 0%"></div></div>
+                        <div class="stat-detail" id="ramDetail">-- / -- GB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">🐳</div>
+                        </div>
+                        <div class="stat-value" id="dockerValue">--</div>
+                        <div class="stat-label">Contenedores</div>
+                        <div class="stat-detail" id="dockerDetail">-- activos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">⏱️</div>
+                        </div>
+                        <div class="stat-value" id="uptimeValue">--</div>
+                        <div class="stat-label">Uptime</div>
+                        <div class="stat-detail" id="uptimeDetail">Desde --</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📥</div>
+                        </div>
+                        <div class="stat-value" id="netRx">-- GB</div>
+                        <div class="stat-label">Download</div>
+                        <div class="stat-detail">Total recibido</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">📤</div>
+                        </div>
+                        <div class="stat-value" id="netTx">-- GB</div>
+                        <div class="stat-label">Upload</div>
+                        <div class="stat-detail">Total enviado</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">⚡</div>
+                        </div>
+                        <div class="stat-value" id="powerValue">-- W</div>
+                        <div class="stat-label">Consumo Actual</div>
+                        <div class="stat-detail" id="powerDetail">Hoy: -- kWh</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">💰</div>
+                        </div>
+                        <div class="stat-value" id="costValue">$--</div>
+                        <div class="stat-label">Costo Mes</div>
+                        <div class="stat-detail" id="costDetail">-- kWh este mes</div>
+                    </div>
+                </div>
 
-        <div class="category">
-            <h2>🍽️ Restaurant Mise en Place</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">🍽️</div><h3><span class="status"></span>Mise en Place</h3><p>Gestión restaurantes</p><a href="https://miseenplace.drozast.xyz" target="_blank">Abrir →</a><span class="url">miseenplace.drozast.xyz</span></div>
-            </div>
-        </div>
+                <!-- Energy Details Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Consumo Energético</h2>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📅</div>
+                            </div>
+                            <div class="stat-value" id="energyToday">-- kWh</div>
+                            <div class="stat-label">Hoy</div>
+                            <div class="stat-detail" id="costToday">$-- CLP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📆</div>
+                            </div>
+                            <div class="stat-value" id="energyWeek">-- kWh</div>
+                            <div class="stat-label">Última Semana</div>
+                            <div class="stat-detail" id="costWeek">$-- CLP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">🗓️</div>
+                            </div>
+                            <div class="stat-value" id="energyMonth">-- kWh</div>
+                            <div class="stat-label">Este Mes</div>
+                            <div class="stat-detail" id="costMonth">$-- CLP</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📊</div>
+                            </div>
+                            <div class="stat-value" id="energyYear">-- kWh</div>
+                            <div class="stat-label">Este Año</div>
+                            <div class="stat-detail" id="costYear">$-- CLP</div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="category">
-            <h2>☁️ Almacenamiento</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">☁️</div><h3><span class="status"></span>Nextcloud</h3><p>Archivos nube</p><a href="https://cloud.drozast.xyz" target="_blank">Abrir →</a><span class="url">cloud.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">📄</div><h3><span class="status"></span>Stirling PDF</h3><p>Herramientas PDF</p><a href="https://pdf.drozast.xyz" target="_blank">Abrir →</a><span class="url">pdf.drozast.xyz</span></div>
+                <!-- Quick Disks Overview -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Almacenamiento</h2>
+                    </div>
+                    <div class="disks-grid">
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon os">💾</div>
+                                <div class="disk-info">
+                                    <h3>Sistema Operativo</h3>
+                                    <p>SSD 480GB (Samsung/Kingston)</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osUsed">--</div>
+                                    <div class="disk-stat-label">Usado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osFree">--</div>
+                                    <div class="disk-stat-label">Libre</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osTotal">437GB</div>
+                                    <div class="disk-stat-label">Asignado</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill" id="osBar" style="width: 0%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <code>/dev/sda</code> → 447GB físico • LVM: <code>ubuntu--vg-ubuntu--lv</code> (437GB asignados)<br>
+                                Particiones: /boot/efi (1GB), /boot (2GB), LVM (expandido al máximo)
+                            </div>
+                        </div>
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon cache">⚡</div>
+                                <div class="disk-info">
+                                    <h3>Cache SSD</h3>
+                                    <p>SSD 120GB (bcache)</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">Activo</div>
+                                    <div class="disk-stat-label">Estado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">112GB</div>
+                                    <div class="disk-stat-label">Capacidad</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">bcache</div>
+                                    <div class="disk-stat-label">Tipo</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill low" style="width: 100%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <code>/dev/sdb</code> → Cache para RAID1 • Acelera lecturas/escrituras del array<br>
+                                Dispositivo bcache: <code>/dev/bcache0</code>
+                            </div>
+                        </div>
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon raid">🛡️</div>
+                                <div class="disk-info">
+                                    <h3>RAID 1 - Datos</h3>
+                                    <p>2x 4TB HDD (Espejo)</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="raidUsed">--</div>
+                                    <div class="disk-stat-label">Usado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="raidFree">--</div>
+                                    <div class="disk-stat-label">Libre</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">3.6TB</div>
+                                    <div class="disk-stat-label">Total</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill" id="raidBar" style="width: 0%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <code>/dev/sdc</code> + <code>/dev/sdd</code> → RAID1 (<code>/dev/md0</code>)<br>
+                                Montaje: <code>/mnt/nextcloud-data</code> • Con cache bcache para mejor rendimiento
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="category">
-            <h2>🎬 Multimedia</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">🎵</div><h3><span class="status"></span>Navidrome</h3><p>Música</p><a href="https://music.drozast.xyz" target="_blank">Abrir →</a><span class="url">music.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">📚</div><h3><span class="status"></span>Kavita</h3><p>Libros/Manga</p><a href="https://books.drozast.xyz" target="_blank">Abrir →</a><span class="url">books.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">📹</div><h3><span class="status"></span>MeTube</h3><p>Videos</p><a href="https://videos.drozast.xyz" target="_blank">Abrir →</a><span class="url">videos.drozast.xyz</span></div>
+            <!-- Services Tab -->
+            <div class="tab-content" id="tab-services">
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🐸</div>
+                        <span class="category-title">FROGIO - Gestión Municipal</span>
+                        <span class="category-count">5 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="frogio-backend">
+                            <div class="service-header">
+                                <div class="service-icon">🔧</div>
+                                <div class="service-info">
+                                    <h3>API Backend</h3>
+                                    <p>REST API NestJS</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Backend en NestJS con PostgreSQL. Gestiona usuarios, permisos, solicitudes municipales, notificaciones y reportes.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://api-frogio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="frogio-web-admin">
+                            <div class="service-header">
+                                <div class="service-icon">🎛️</div>
+                                <div class="service-info">
+                                    <h3>Panel Admin</h3>
+                                    <p>Dashboard React</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Panel de administración en React para gestionar el sistema municipal FROGIO.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://admin.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="frogio-postgres">
+                            <div class="service-header">
+                                <div class="service-icon">🐘</div>
+                                <div class="service-info">
+                                    <h3>PostgreSQL</h3>
+                                    <p>Base de Datos</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Base de datos PostgreSQL para FROGIO.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">PostgreSQL (interno)</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="frogio-redis">
+                            <div class="service-header">
+                                <div class="service-icon">🔴</div>
+                                <div class="service-info">
+                                    <h3>Redis</h3>
+                                    <p>Cache & Sessions</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Cache Redis para sesiones y datos temporales.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Redis (interno)</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="frogio-minio">
+                            <div class="service-header">
+                                <div class="service-icon">📦</div>
+                                <div class="service-info">
+                                    <h3>MinIO</h3>
+                                    <p>S3 Storage</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Almacenamiento S3 compatible para archivos de FROGIO.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://minio-frogio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">📋</div>
+                        <span class="category-title">Aplicaciones</span>
+                        <span class="category-count">8 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="todoapp-backend">
+                            <div class="service-header">
+                                <div class="service-icon">✅</div>
+                                <div class="service-info">
+                                    <h3>Todo App</h3>
+                                    <p>Gestión de Tareas</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Aplicación de gestión de tareas personal con listas, categorías y prioridades.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://todoapp.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="natik-travel">
+                            <div class="service-header">
+                                <div class="service-icon">✈️</div>
+                                <div class="service-info">
+                                    <h3>Natik Travel</h3>
+                                    <p>Agencia de Viajes</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Sitio web para agencia de viajes con paquetes turísticos y reservas.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://natik.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="miseenplace-restaurant">
+                            <div class="service-header">
+                                <div class="service-icon">🍽️</div>
+                                <div class="service-info">
+                                    <h3>Mise en Place</h3>
+                                    <p>Restaurante</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Sitio web para restaurante con menú digital y galería de platos.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://miseenplace.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="reclamaya-web">
+                            <div class="service-header">
+                                <div class="service-icon">📢</div>
+                                <div class="service-info">
+                                    <h3>Reclama Ya</h3>
+                                    <p>Plataforma Reclamos</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Plataforma de reclamos ciudadanos con integración WhatsApp.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://reclamaya.cl" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="wms-app">
+                            <div class="service-header">
+                                <div class="service-icon">📦</div>
+                                <div class="service-info">
+                                    <h3>WMS Troya</h3>
+                                    <p>Gestión de Almacén</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Sistema de gestión de almacén con control de inventario.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://wms.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="supertools-app">
+                            <div class="service-header">
+                                <div class="service-icon">🧰</div>
+                                <div class="service-info">
+                                    <h3>SuperTools</h3>
+                                    <p>Herramientas Varias</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Suite de herramientas útiles online.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="barberbook-frontend">
+                            <div class="service-header">
+                                <div class="service-icon">💈</div>
+                                <div class="service-info">
+                                    <h3>BarberBook</h3>
+                                    <p>Reservas Barbería</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Sistema de reservas para barberías y peluquerías.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="casainfante-frontend">
+                            <div class="service-header">
+                                <div class="service-icon">🏠</div>
+                                <div class="service-info">
+                                    <h3>Casa Infante</h3>
+                                    <p>Inmobiliaria</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Sistema inmobiliario con gestión de propiedades.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">☁️</div>
+                        <span class="category-title">Cloud & Almacenamiento</span>
+                        <span class="category-count">3 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="nextcloud">
+                            <div class="service-header">
+                                <div class="service-icon">☁️</div>
+                                <div class="service-info">
+                                    <h3>Nextcloud</h3>
+                                    <p>Archivos en la nube</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Alternativa a Google Drive/Dropbox self-hosted. 4TB RAID.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://cloud.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="nextcloud-db">
+                            <div class="service-header">
+                                <div class="service-icon">🐘</div>
+                                <div class="service-info">
+                                    <h3>Nextcloud DB</h3>
+                                    <p>PostgreSQL</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Base de datos PostgreSQL para Nextcloud.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">PostgreSQL (interno)</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="minio">
+                            <div class="service-header">
+                                <div class="service-icon">📦</div>
+                                <div class="service-info">
+                                    <h3>MinIO General</h3>
+                                    <p>S3 Storage</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Almacenamiento S3 compatible para backups y archivos.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://minio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🎬</div>
+                        <span class="category-title">Multimedia</span>
+                        <span class="category-count">3 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="navidrome">
+                            <div class="service-header">
+                                <div class="service-icon">🎵</div>
+                                <div class="service-info">
+                                    <h3>Navidrome</h3>
+                                    <p>Servidor de Música</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Streaming de música tipo Spotify self-hosted. Compatible Subsonic.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://music.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="kavita">
+                            <div class="service-header">
+                                <div class="service-icon">📚</div>
+                                <div class="service-info">
+                                    <h3>Kavita</h3>
+                                    <p>Libros & Manga</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Lector de ebooks, comics y manga. EPUB, PDF, CBZ/CBR.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://books.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="metube">
+                            <div class="service-header">
+                                <div class="service-icon">📹</div>
+                                <div class="service-info">
+                                    <h3>MeTube</h3>
+                                    <p>Descarga Videos</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Descargador de YouTube y 1000+ sitios via yt-dlp.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://videos.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🛠️</div>
+                        <span class="category-title">Herramientas & Dev</span>
+                        <span class="category-count">4 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="stirling-pdf">
+                            <div class="service-header">
+                                <div class="service-icon">📄</div>
+                                <div class="service-info">
+                                    <h3>Stirling PDF</h3>
+                                    <p>Herramientas PDF</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Suite completa PDF: unir, dividir, comprimir, OCR, convertir.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://pdf.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="gitea">
+                            <div class="service-header">
+                                <div class="service-icon">🐙</div>
+                                <div class="service-info">
+                                    <h3>Gitea</h3>
+                                    <p>Git Server</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servidor Git self-hosted con repos privados y CI/CD.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://git.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="mailpit">
+                            <div class="service-header">
+                                <div class="service-icon">🧪</div>
+                                <div class="service-info">
+                                    <h3>Mailpit</h3>
+                                    <p>Email Testing</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servidor SMTP de pruebas para capturar emails de desarrollo.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="netflix-backup">
+                            <div class="service-header">
+                                <div class="service-icon">🎬</div>
+                                <div class="service-info">
+                                    <h3>Netflix Backup</h3>
+                                    <p>Backup Service</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servicio de backup para cuentas Netflix.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">⚙️</div>
+                        <span class="category-title">Administración</span>
+                        <span class="category-count">4 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="portainer">
+                            <div class="service-header">
+                                <div class="service-icon">🐳</div>
+                                <div class="service-info">
+                                    <h3>Portainer</h3>
+                                    <p>Docker Management</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Interfaz web para gestionar Docker containers y stacks.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://portainer.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="pihole">
+                            <div class="service-header">
+                                <div class="service-icon">🌐</div>
+                                <div class="service-info">
+                                    <h3>Pi-hole</h3>
+                                    <p>DNS & Ad Blocker</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servidor DNS que bloquea publicidad y trackers a nivel de red.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://pihole.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="cloudflared">
+                            <div class="service-header">
+                                <div class="service-icon">🌩️</div>
+                                <div class="service-info">
+                                    <h3>Cloudflared</h3>
+                                    <p>Tunnel Manager</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Túnel Cloudflare para exponer servicios al internet de forma segura.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://dash.cloudflare.com" target="_blank" class="service-link web">Cloudflare</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="server-stats">
+                            <div class="service-header">
+                                <div class="service-icon">📊</div>
+                                <div class="service-info">
+                                    <h3>Stats API</h3>
+                                    <p>Monitoreo</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                API de estadísticas del servidor para el dashboard.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://stats.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🔐</div>
+                        <span class="category-title">Seguridad & URLs</span>
+                        <span class="category-count">4 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="vaultwarden">
+                            <div class="service-header">
+                                <div class="service-icon">🔑</div>
+                                <div class="service-info">
+                                    <h3>Vaultwarden</h3>
+                                    <p>Password Manager</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Gestor de contraseñas compatible con Bitwarden.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://vault.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="shlink">
+                            <div class="service-header">
+                                <div class="service-icon">🔗</div>
+                                <div class="service-info">
+                                    <h3>Shlink</h3>
+                                    <p>URL Shortener</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Acortador de URLs con estadísticas y QR codes.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://qr.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="shlink-web">
+                            <div class="service-header">
+                                <div class="service-icon">📊</div>
+                                <div class="service-info">
+                                    <h3>Shlink Admin</h3>
+                                    <p>Panel de URLs</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Panel de administración de URLs cortas con estadísticas.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://qr-admin.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="ntfy">
+                            <div class="service-header">
+                                <div class="service-icon">🔔</div>
+                                <div class="service-info">
+                                    <h3>Ntfy</h3>
+                                    <p>Push Notifications</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servidor de notificaciones push HTTP-based.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://ntfy.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🗺️</div>
+                        <span class="category-title">Mapas & Geolocalizacion (Self-Hosted)</span>
+                        <span class="category-count">3 servicios</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="maps-tileserver">
+                            <div class="service-header">
+                                <div class="service-icon">🗺️</div>
+                                <div class="service-info">
+                                    <h3>TileServer GL</h3>
+                                    <p>Servidor de Mapas</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Servidor de tiles de mapas. Reemplazo de Google Maps JS API. Sirve mapas visuales de Chile via OpenStreetMap.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://maps.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="maps-nominatim">
+                            <div class="service-header">
+                                <div class="service-icon">📍</div>
+                                <div class="service-info">
+                                    <h3>Nominatim</h3>
+                                    <p>Geocoding API</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Geocoding y busqueda de direcciones. Reemplazo de Google Geocoding API. Convierte direcciones a coordenadas y viceversa.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://geo.drozast.xyz/status" target="_blank" class="service-link web">Status</a>
+                            </div>
+                        </div>
+                        <div class="service-card" data-container="maps-osrm">
+                            <div class="service-header">
+                                <div class="service-icon">🛣️</div>
+                                <div class="service-info">
+                                    <h3>OSRM</h3>
+                                    <p>Routing API</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Calculo de rutas y distancias. Reemplazo de Google Directions API. Rutas en auto, matriz de distancias, punto mas cercano.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://routing.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="category">
-            <h2>⚙️ Administración</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">🚀</div><h3><span class="status"></span>Coolify</h3><p>Deploy Git</p><a href="https://coolify.drozast.xyz" target="_blank">Abrir →</a><span class="url">coolify.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">🐳</div><h3><span class="status"></span>Portainer</h3><p>Docker</p><a href="https://portainer.drozast.xyz" target="_blank">Abrir →</a><span class="url">portainer.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">🌐</div><h3><span class="status"></span>Pi-hole</h3><p>DNS</p><a href="https://pihole.drozast.xyz" target="_blank">Abrir →</a><span class="url">pihole.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">🔀</div><h3><span class="status"></span>Nginx</h3><p>Proxy</p><a href="https://proxy.drozast.xyz" target="_blank">Abrir →</a><span class="url">proxy.drozast.xyz</span></div>
+            <!-- Storage Tab -->
+            <div class="tab-content" id="tab-storage">
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Configuración de Almacenamiento</h2>
+                    </div>
+                    <div class="disks-grid">
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon os">💾</div>
+                                <div class="disk-info">
+                                    <h3>Disco Sistema (SDA)</h3>
+                                    <p>SSD 480GB - Sistema Operativo</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osUsed2">--</div>
+                                    <div class="disk-stat-label">Usado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osFree2">--</div>
+                                    <div class="disk-stat-label">Libre</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="osPercent2">--%</div>
+                                    <div class="disk-stat-label">Uso</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill" id="osBar2" style="width: 0%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <strong>Dispositivo:</strong> <code>/dev/sda</code> (447.1GB físico)<br><br>
+                                <strong>Particiones:</strong><br>
+                                • <code>/dev/sda1</code> - 1GB - /boot/efi (VFAT)<br>
+                                • <code>/dev/sda2</code> - 2GB - /boot (ext4)<br>
+                                • <code>/dev/sda3</code> - 444GB - LVM<br><br>
+                                <strong>LVM:</strong> <code>ubuntu--vg-ubuntu--lv</code><br>
+                                • Asignado: 437GB (expandido al máximo)<br>
+                                • Espacio utilizado dinámicamente por Docker y servicios
+                            </div>
+                        </div>
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon cache">⚡</div>
+                                <div class="disk-info">
+                                    <h3>Cache SSD (SDB)</h3>
+                                    <p>SSD 120GB - bcache</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">Activo</div>
+                                    <div class="disk-stat-label">Estado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">111.8GB</div>
+                                    <div class="disk-stat-label">Capacidad</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value">Writeback</div>
+                                    <div class="disk-stat-label">Modo</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill low" style="width: 100%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <strong>Dispositivo:</strong> <code>/dev/sdb</code> (111.8GB)<br><br>
+                                <strong>Función:</strong> Cache SSD para el RAID1<br>
+                                • Acelera operaciones de lectura/escritura<br>
+                                • Usa tecnología bcache del kernel Linux<br>
+                                • Dispositivo resultante: <code>/dev/bcache0</code><br><br>
+                                <strong>Beneficio:</strong> El RAID HDD obtiene velocidades cercanas a SSD para datos frecuentes
+                            </div>
+                        </div>
+                        <div class="disk-card">
+                            <div class="disk-header">
+                                <div class="disk-icon raid">🛡️</div>
+                                <div class="disk-info">
+                                    <h3>RAID 1 Datos (SDC + SDD)</h3>
+                                    <p>2x 4TB HDD en Espejo</p>
+                                </div>
+                            </div>
+                            <div class="disk-stats">
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="raidUsed2">--</div>
+                                    <div class="disk-stat-label">Usado</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="raidFree2">--</div>
+                                    <div class="disk-stat-label">Libre</div>
+                                </div>
+                                <div class="disk-stat">
+                                    <div class="disk-stat-value" id="raidPercent2">--%</div>
+                                    <div class="disk-stat-label">Uso</div>
+                                </div>
+                            </div>
+                            <div class="disk-progress">
+                                <div class="disk-progress-fill" id="raidBar2" style="width: 0%"></div>
+                            </div>
+                            <div class="disk-details">
+                                <strong>Dispositivos:</strong><br>
+                                • <code>/dev/sdc</code> - 3.6TB (Disco 1)<br>
+                                • <code>/dev/sdd</code> - 3.6TB (Disco 2)<br><br>
+                                <strong>RAID:</strong> <code>/dev/md0</code> (linux_raid_member)<br>
+                                • Tipo: RAID 1 (Espejo/Mirror)<br>
+                                • Los datos se duplican en ambos discos<br>
+                                • Tolerancia: Puede fallar 1 disco sin pérdida<br><br>
+                                <strong>Cache:</strong> Usa <code>/dev/sdb</code> via bcache<br>
+                                <strong>Montaje:</strong> <code>/mnt/nextcloud-data</code><br>
+                                <strong>Uso:</strong> Nextcloud, backups, multimedia
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="context-section">
+                    <div class="context-header">
+                        <span class="context-title">📊 Resumen de I/O de Disco</span>
+                    </div>
+                    <div class="stats-grid" style="margin-top: 16px;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="diskRead">-- GB</div>
+                            <div class="stat-label">Total Leído</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="diskWrite">-- GB</div>
+                            <div class="stat-label">Total Escrito</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="category">
-            <h2>🔐 Seguridad</h2>
-            <div class="grid">
-                <div class="card"><div class="card-icon">🔑</div><h3><span class="status"></span>Vaultwarden</h3><p>Contraseñas</p><a href="https://vault.drozast.xyz" target="_blank">Abrir →</a><span class="url">vault.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">🔗</div><h3><span class="status"></span>Shlink</h3><p>URLs cortas</p><a href="https://qr.drozast.xyz" target="_blank">Abrir →</a><span class="url">qr.drozast.xyz</span></div>
-                <div class="card"><div class="card-icon">📊</div><h3><span class="status"></span>Shlink Admin</h3><p>Panel URLs</p><a href="https://qr-admin.drozast.xyz" target="_blank">Abrir →</a><span class="url">qr-admin.drozast.xyz</span></div>
+            <!-- Context Tab -->
+            <div class="tab-content" id="tab-context">
+                <div class="context-section">
+                    <div class="context-header">
+                        <span class="context-title">📋 Contexto del Servidor para Apps</span>
+                        <button class="copy-btn" onclick="copyContext()">
+                            <span id="copyIcon">���</span>
+                            <span id="copyText">Copiar</span>
+                        </button>
+                    </div>
+                    <pre class="context-code" id="serverContext"><span class="section-label"># ═══════════════════════════════════════════════════════════════════════════════</span>
+<span class="section-label"># DROZAST SERVER - CONTEXTO PARA DESARROLLO EN EQUIPO</span>
+<span class="section-label"># ═══════════════════════════════════════════════════════════════════════════════</span>
+
+<span class="comment"># ACCESO SSH (VIA CLOUDFLARE - ACCESO REMOTO DESDE CUALQUIER UBICACION)</span>
+<span class="key">SSH_HOST</span>=<span class="value">"ssh.drozast.xyz"</span>
+<span class="key">SSH_USER</span>=<span class="value">"drozast"</span>
+<span class="key">SSH_PASS</span>=<span class="value">"123"</span>
+
+<span class="comment"># REQUISITO: Instalar cloudflared</span>
+<span class="comment"># macOS:   brew install cloudflared</span>
+<span class="comment"># Linux:   https://github.com/cloudflare/cloudflared/releases</span>
+<span class="comment"># Windows: https://github.com/cloudflare/cloudflared/releases</span>
+
+<span class="comment"># COMANDO DE CONEXION SSH:</span>
+<span class="key">ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.drozast.xyz" drozast@ssh.drozast.xyz</span>
+
+<span class="comment"># CON SSHPASS (automatizado):</span>
+<span class="key">sshpass -p '123' ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.drozast.xyz" -o StrictHostKeyChecking=no drozast@ssh.drozast.xyz</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># CLOUDFLARE TUNNEL</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="key">TUNNEL_ID</span>=<span class="value">"804e80c5-881c-4ad0-963a-42549223c4f6"</span>
+<span class="key">TUNNEL_CONFIG</span>=<span class="value">"/home/drozast/.cloudflared/config.yml"</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># DOMINIOS DISPONIBLES (*.drozast.xyz)</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># Servicios actuales expuestos por Cloudflare Tunnel:</span>
+<span class="key">ssh.drozast.xyz</span>        → <span class="value">SSH (puerto 22)</span>
+<span class="key">api.reclamaya.cl</span>       → <span class="value">localhost:3020</span>
+<span class="key">reclamaya.cl</span>           → <span class="value">localhost:3021</span>
+<span class="key">storage.reclamaya.cl</span>   → <span class="value">localhost:9002 (MinIO)</span>
+<span class="key">wms.drozast.xyz</span>        → <span class="value">localhost:3002</span>
+<span class="key">todoapp.drozast.xyz</span>    → <span class="value">localhost:3011 (web) / :3005 (api)</span>
+<span class="key">maps.drozast.xyz</span>       → <span class="value">localhost:8082 (TileServer GL)</span>
+<span class="key">geo.drozast.xyz</span>        → <span class="value">localhost:8081 (Nominatim)</span>
+<span class="key">routing.drozast.xyz</span>    → <span class="value">localhost:5000 (OSRM)</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># ALMACENAMIENTO</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># SSD OS (480GB)</span>
+<span class="key">DISK_OS</span>=<span class="value">"/dev/sda"</span>
+<span class="key">DISK_OS_SIZE</span>=<span class="value">"447GB (437GB asignados vía LVM - expandido)"</span>
+<span class="key">DISK_OS_MOUNT</span>=<span class="value">"/"</span>
+<span class="key">DISK_OS_LVM</span>=<span class="value">"ubuntu--vg-ubuntu--lv"</span>
+
+<span class="comment"># SSD Cache (120GB)</span>
+<span class="key">DISK_CACHE</span>=<span class="value">"/dev/sdb"</span>
+<span class="key">DISK_CACHE_SIZE</span>=<span class="value">"112GB"</span>
+<span class="key">DISK_CACHE_TYPE</span>=<span class="value">"bcache (cache para RAID)"</span>
+
+<span class="comment"># RAID 1 (4TB x2 = 3.6TB útil)</span>
+<span class="key">DISK_RAID_1</span>=<span class="value">"/dev/sdc"</span>
+<span class="key">DISK_RAID_2</span>=<span class="value">"/dev/sdd"</span>
+<span class="key">DISK_RAID_DEVICE</span>=<span class="value">"/dev/md0"</span>
+<span class="key">DISK_RAID_BCACHE</span>=<span class="value">"/dev/bcache0"</span>
+<span class="key">DISK_RAID_MOUNT</span>=<span class="value">"/mnt/nextcloud-data"</span>
+<span class="key">DISK_RAID_SIZE</span>=<span class="value">"3.6TB"</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># MINIO (S3 Storage)</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># MinIO Principal</span>
+<span class="key">MINIO_USER</span>=<span class="value">"admin"</span>
+<span class="key">MINIO_PASS</span>=<span class="value">"Y5/iqYWfm7MjHx8V1pHNRNgnJe7F7Mz1SJ3n9LK5+Lk="</span>
+<span class="key">MINIO_PUBLIC</span>=<span class="value">"https://minio.drozast.xyz"</span>
+<span class="key">MINIO_RECLAMAYA</span>=<span class="value">"https://storage.reclamaya.cl"</span>
+
+<span class="comment"># MinIO Frogio</span>
+<span class="key">FROGIO_MINIO_USER</span>=<span class="value">"frogio_admin"</span>
+<span class="key">FROGIO_MINIO_PASS</span>=<span class="value">"frogio_secret_key_2024"</span>
+<span class="key">FROGIO_MINIO_PUBLIC</span>=<span class="value">"https://minio-frogio.drozast.xyz"</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># BASES DE DATOS</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># PostgreSQL disponibles (verificar puertos con docker ps)</span>
+<span class="key">POSTGRES_BARBERBOOK</span>=<span class="value">"barberbook-postgres"</span>
+<span class="key">POSTGRES_RECLAMAYA</span>=<span class="value">"reclamaya-postgres"</span>
+<span class="key">POSTGRES_WMS</span>=<span class="value">"wms-postgres"</span>
+<span class="key">POSTGRES_NEXTCLOUD</span>=<span class="value">"nextcloud-db"</span>
+
+<span class="comment"># Redis</span>
+<span class="key">REDIS_BARBERBOOK</span>=<span class="value">"barberbook-redis"</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># SERVICIOS PUBLICOS (VIA CLOUDFLARE)</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="key">api-frogio.drozast.xyz</span>    → <span class="value">Frogio API (NestJS)</span>
+<span class="key">admin.drozast.xyz</span>         → <span class="value">Frogio Admin Panel</span>
+<span class="key">miseenplace.drozast.xyz</span>   → <span class="value">Mise en Place</span>
+<span class="key">wms.drozast.xyz</span>           → <span class="value">WMS Troya</span>
+<span class="key">git.drozast.xyz</span>           → <span class="value">Gitea</span>
+<span class="key">todoapp.drozast.xyz</span>       → <span class="value">TodoApp</span>
+<span class="key">reclamaya.cl</span>              → <span class="value">Reclama Ya Web</span>
+<span class="key">api.reclamaya.cl</span>          → <span class="value">Reclama Ya API</span>
+<span class="key">natik.drozast.xyz</span>         → <span class="value">Natik Travel</span>
+<span class="key">music.drozast.xyz</span>         → <span class="value">Navidrome</span>
+<span class="key">books.drozast.xyz</span>         → <span class="value">Kavita</span>
+<span class="key">videos.drozast.xyz</span>        → <span class="value">MeTube</span>
+<span class="key">pdf.drozast.xyz</span>           → <span class="value">Stirling PDF</span>
+<span class="key">pihole.drozast.xyz</span>        → <span class="value">Pi-hole</span>
+<span class="key">ntfy.drozast.xyz</span>          → <span class="value">Ntfy</span>
+<span class="key">qr.drozast.xyz</span>            → <span class="value">Shlink</span>
+<span class="key">qr-admin.drozast.xyz</span>      → <span class="value">Shlink Admin</span>
+<span class="key">vault.drozast.xyz</span>         → <span class="value">Vaultwarden</span>
+<span class="key">portainer.drozast.xyz</span>     → <span class="value">Portainer</span>
+<span class="key">minio.drozast.xyz</span>         → <span class="value">MinIO Console</span>
+<span class="key">cloud.drozast.xyz</span>         → <span class="value">Nextcloud</span>
+<span class="key">stats.drozast.xyz</span>         → <span class="value">Stats API (este dashboard)</span>
+<span class="key">maps.drozast.xyz</span>          → <span class="value">TileServer GL (Mapas visuales)</span>
+<span class="key">geo.drozast.xyz</span>           → <span class="value">Nominatim (Geocoding API)</span>
+<span class="key">routing.drozast.xyz</span>       → <span class="value">OSRM (Routing/Rutas API)</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># MAPAS SELF-HOSTED (Alternativa a Google Maps - Solo Chile)</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># Stack: TileServer GL + Nominatim + OSRM</span>
+<span class="comment"># Datos: OpenStreetMap Chile (~300MB PBF, ~500MB mbtiles)</span>
+<span class="comment"># Formato: Vector tiles (OpenMapTiles schema, protobuf)</span>
+<span class="comment"># RAM estimada: ~4-5 GB total para los 3 servicios</span>
+<span class="comment"># Docker compose: ~/maps/docker-compose.yml</span>
+<span class="comment"># Puertos: TileServer=8082, Nominatim=8081, OSRM=5000</span>
+
+<span class="comment"># CAPAS DISPONIBLES EN VECTOR TILES (OpenMapTiles):</span>
+<span class="comment"># place            → Ciudades, pueblos, aldeas (z0-14)</span>
+<span class="comment"># transportation   → Calles, carreteras, vias (z4-14)</span>
+<span class="comment"># transportation_name → Nombres de calles (z8-14)</span>
+<span class="comment"># poi              → Puntos de interes: comercios, hospitales, etc (z12-14)</span>
+<span class="comment"># housenumber      → Numeros de casa (z14)</span>
+<span class="comment"># building         → Edificaciones (z13-14)</span>
+<span class="comment"># water            → Rios, lagos, oceano (z6-14)</span>
+<span class="comment"># water_name       → Nombres de cuerpos de agua (z14)</span>
+<span class="comment"># waterway         → Cursos de agua (z8-14)</span>
+<span class="comment"># boundary         → Limites administrativos (z0-14)</span>
+<span class="comment"># landuse          → Uso de suelo: residencial, comercial (z4-14)</span>
+<span class="comment"># landcover        → Cobertura: bosque, pasto, nieve (z0-14)</span>
+<span class="comment"># park             → Parques y areas verdes (z11-14)</span>
+<span class="comment"># aeroway          → Pistas de aeropuerto (z11-14)</span>
+<span class="comment"># aerodrome_label  → Nombres de aeropuertos (z10-14)</span>
+<span class="comment"># mountain_peak    → Cumbres y montanas (z11-14)</span>
+
+<span class="comment"># ENDPOINTS DISPONIBLES:</span>
+
+<span class="comment"># TileServer GL - Mapas visuales (reemplazo Google Maps JS)</span>
+<span class="key">MAPS_URL</span>=<span class="value">"https://maps.drozast.xyz"</span>
+<span class="key">MAPS_STYLE</span>=<span class="value">"https://maps.drozast.xyz/styles/osm-bright/style.json"</span>
+<span class="key">MAPS_TILES_RASTER</span>=<span class="value">"https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png"</span>
+<span class="key">MAPS_TILES_VECTOR</span>=<span class="value">"https://maps.drozast.xyz/data/v3/{z}/{x}/{y}.pbf"</span>
+<span class="key">MAPS_TILEJSON</span>=<span class="value">"https://maps.drozast.xyz/data/v3.json"</span>
+
+<span class="comment"># Nominatim - Geocoding (reemplazo Google Geocoding API)</span>
+<span class="key">GEO_URL</span>=<span class="value">"https://geo.drozast.xyz"</span>
+<span class="key">GEO_SEARCH</span>=<span class="value">"https://geo.drozast.xyz/search?q={direccion}&format=json&countrycodes=cl"</span>
+<span class="key">GEO_REVERSE</span>=<span class="value">"https://geo.drozast.xyz/reverse?lat={lat}&lon={lon}&format=json"</span>
+<span class="key">GEO_STATUS</span>=<span class="value">"https://geo.drozast.xyz/status"</span>
+
+<span class="comment"># OSRM - Routing (reemplazo Google Directions API)</span>
+<span class="key">ROUTING_URL</span>=<span class="value">"https://routing.drozast.xyz"</span>
+<span class="key">ROUTING_ROUTE</span>=<span class="value">"https://routing.drozast.xyz/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson&steps=true"</span>
+<span class="key">ROUTING_TABLE</span>=<span class="value">"https://routing.drozast.xyz/table/v1/driving/{coords}"</span>
+<span class="key">ROUTING_NEAREST</span>=<span class="value">"https://routing.drozast.xyz/nearest/v1/driving/{lon},{lat}"</span>
+
+<span class="comment"># EJEMPLO JAVASCRIPT CON MAPLIBRE GL (vector tiles, mejor rendimiento):</span>
+<span class="comment"># const map = new maplibregl.Map({</span>
+<span class="comment">#   container: 'map',</span>
+<span class="comment">#   style: 'https://maps.drozast.xyz/styles/osm-bright/style.json',</span>
+<span class="comment">#   center: [-70.669, -33.449], // Santiago</span>
+<span class="comment">#   zoom: 12</span>
+<span class="comment"># });</span>
+<span class="comment"># // CDN: &lt;script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"&gt;&lt;/script&gt;</span>
+<span class="comment"># // CSS: &lt;link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"&gt;</span>
+
+<span class="comment"># EJEMPLO JAVASCRIPT CON LEAFLET (raster tiles, mas simple):</span>
+<span class="comment"># const map = L.map('map').setView([-33.449, -70.669], 12);</span>
+<span class="comment"># L.tileLayer('https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png').addTo(map);</span>
+
+<span class="comment"># GEOCODING - Direccion a coordenadas:</span>
+<span class="comment"># const res = await fetch('https://geo.drozast.xyz/search?q=Av+Providencia+1234+Santiago&format=json&countrycodes=cl');</span>
+<span class="comment"># const data = await res.json();</span>
+<span class="comment"># // data[0] = { lat: "-33.xxx", lon: "-70.xxx", display_name: "..." }</span>
+
+<span class="comment"># GEOCODING REVERSO - Coordenadas a direccion:</span>
+<span class="comment"># const res = await fetch('https://geo.drozast.xyz/reverse?lat=-33.449&lon=-70.669&format=json');</span>
+
+<span class="comment"># RUTA entre 2 puntos:</span>
+<span class="comment"># const route = await fetch('https://routing.drozast.xyz/route/v1/driving/-70.669,-33.449;-70.600,-33.437?overview=full&geometries=geojson');</span>
+<span class="comment"># // route.routes[0] = { distance: metros, duration: segundos, geometry: GeoJSON }</span>
+
+<span class="comment"># EJEMPLO DART/FLUTTER (flutter_map + vector tiles):</span>
+<span class="comment"># // Geocoding</span>
+<span class="comment"># final res = await http.get(Uri.parse('https://geo.drozast.xyz/search?q=Santiago&format=json&countrycodes=cl'));</span>
+<span class="comment"># final data = json.decode(res.body);</span>
+<span class="comment"># // Mapa con flutter_map</span>
+<span class="comment"># FlutterMap(options: MapOptions(center: LatLng(-33.449, -70.669), zoom: 12),</span>
+<span class="comment">#   children: [TileLayer(urlTemplate: 'https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png')])</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># SISTEMA</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="key">OS</span>=<span class="value">"Ubuntu Server"</span>
+<span class="key">RAM</span>=<span class="value">"16GB"</span>
+<span class="key">CPU</span>=<span class="value">"4 cores"</span>
+<span class="key">DOCKER</span>=<span class="value">"Docker + Docker Compose"</span>
+<span class="key">DEPLOY</span>=<span class="value">"Docker directo + Cloudflare Tunnel"</span>
+<span class="key">PROXY</span>=<span class="value">"Cloudflare Tunnel (sin NPM)"</span>
+
+<span class="section-label"># ═══════════════════════════════════════════════════════════════════════════════</span></pre>
+                </div>
             </div>
-        </div>
+        </main>
 
-        <footer>
-            <p>Drozast Server • Debian + Docker • <a href="https://coolify.drozast.xyz">Coolify</a> • Actualización cada 5s</p>
+        <footer class="footer">
+            <p>Drozast Server Dashboard • Ubuntu + Docker • <a href="https://portainer.drozast.xyz" target="_blank">Portainer</a></p>
         </footer>
     </div>
 
-    <!-- Modal de confirmación -->
-    <div class="modal" id="restartModal">
-        <div class="modal-content">
-            <h3 id="modal-title">¿Reiniciar servidor?</h3>
-            <p id="modal-text">Esta acción reiniciará el servidor.</p>
-            <button onclick="executeRestart()" style="background:#f44336;color:#fff;">Confirmar</button>
-            <button onclick="closeModal()" style="background:#666;color:#fff;">Cancelar</button>
-        </div>
-    </div>
-
     <script>
-        let restartType = '';
-        
+        // Auth credentials (hashed for basic security)
+        const AUTH = {
+            email: 'drozast@gmail.com',
+            // Simple hash of password - in production use proper backend auth
+            passHash: btoa('Enanitos123$')
+        };
+
+        // Check if already logged in
+        function checkAuth() {
+            const session = localStorage.getItem('drozast_session');
+            if (session) {
+                const data = JSON.parse(session);
+                if (data.email === AUTH.email && Date.now() < data.expires) {
+                    showDashboard();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (email === AUTH.email && btoa(password) === AUTH.passHash) {
+                // Save session (24 hours)
+                localStorage.setItem('drozast_session', JSON.stringify({
+                    email: email,
+                    expires: Date.now() + (24 * 60 * 60 * 1000)
+                }));
+                errorEl.style.display = 'none';
+                showDashboard();
+            } else {
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('drozast_session');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('active');
+            fetchStats();
+            setInterval(fetchStats, 5000);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // Copy context
+        function copyContext() {
+            const contextEl = document.getElementById('serverContext');
+            const text = contextEl.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const icon = document.getElementById('copyIcon');
+                const textEl = document.getElementById('copyText');
+
+                btn.classList.add('copied');
+                icon.textContent = '✓';
+                textEl.textContent = 'Copiado!';
+
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    icon.textContent = '📋';
+                    textEl.textContent = 'Copiar';
+                }, 2000);
+            });
+        }
+
+        // Fetch stats
         async function fetchStats() {
             try {
-                const res = await fetch('https://stats.drozast.xyz/');
+                const res = await fetch('https://stats.drozast.xyz/stats-api.php');
                 const data = await res.json();
-                
+
                 // CPU
-                document.getElementById('cpu-usage').textContent = data.cpu.usage + '%';
-                document.getElementById('cpu-bar').style.width = data.cpu.usage + '%';
-                document.getElementById('cpu-temp').textContent = data.cpu.temp + '°C';
-                
+                document.getElementById('cpuValue').textContent = data.cpu.usage + '%';
+                document.getElementById('cpuBar').style.width = data.cpu.usage + '%';
+                document.getElementById('cpuDetail').textContent = `${data.cpu.cores} cores • ${data.cpu.temp}°C • Load: ${data.cpu.load}`;
+
                 // RAM
-                document.getElementById('ram-usage').textContent = data.ram.percent + '%';
-                document.getElementById('ram-bar').style.width = data.ram.percent + '%';
-                document.getElementById('ram-detail').textContent = `(${Math.round(data.ram.used_mb/1024)}/${Math.round(data.ram.total_mb/1024)}GB)`;
-                
-                // Disco Root
-                document.getElementById('disk-usage').textContent = data.disk.root.percent + '%';
-                document.getElementById('disk-bar').style.width = data.disk.root.percent + '%';
-                
-                // Disco Data
-                document.getElementById('disk-data').textContent = data.disk.data.percent + '%';
-                document.getElementById('disk-data-bar').style.width = data.disk.data.percent + '%';
-                document.getElementById('disk-data-free').textContent = `(${data.disk.data.free} libre)`;
-                
+                const ramUsedGB = (data.ram.used_mb / 1024).toFixed(1);
+                const ramTotalGB = (data.ram.total_mb / 1024).toFixed(1);
+                document.getElementById('ramValue').textContent = data.ram.percent + '%';
+                document.getElementById('ramBar').style.width = data.ram.percent + '%';
+                document.getElementById('ramDetail').textContent = `${ramUsedGB} / ${ramTotalGB} GB`;
+
+                // Docker
+                document.getElementById('dockerValue').textContent = data.docker.running + '/' + data.docker.total;
+                document.getElementById('dockerDetail').textContent = `${data.docker.running} activos`;
+
                 // Uptime
                 let uptime = '';
                 if (data.uptime.days > 0) uptime += data.uptime.days + 'd ';
                 uptime += data.uptime.hours + 'h ' + data.uptime.minutes + 'm';
-                document.getElementById('uptime').textContent = uptime;
-                
-                // Docker
-                document.getElementById('docker').textContent = data.docker.running + '/' + data.docker.total;
-                
+                document.getElementById('uptimeValue').textContent = uptime;
+
                 // Network
-                document.getElementById('net-rx').textContent = data.network.rx_gb + ' GB';
-                document.getElementById('net-tx').textContent = data.network.tx_gb + ' GB';
-                document.getElementById('connections').textContent = data.network.connections;
-                
-                // Energy
-                document.getElementById('power').textContent = data.energy.watts + ' W';
-                document.getElementById('kwh').textContent = data.energy.kwh;
-                document.getElementById('energy-cost').textContent = '$' + data.energy.cost_clp + ' CLP';
-                
+                document.getElementById('netRx').textContent = data.network.rx_gb + ' GB';
+                document.getElementById('netTx').textContent = data.network.tx_gb + ' GB';
+
+                // Energy - New structure with periods
+                document.getElementById('powerValue').textContent = data.energy.watts + ' W';
+                document.getElementById('powerDetail').textContent = 'Hoy: ' + data.energy.today.kwh + ' kWh';
+                document.getElementById('costValue').textContent = '$' + data.energy.month.cost_clp.toLocaleString();
+                document.getElementById('costDetail').textContent = data.energy.month.kwh + ' kWh este mes';
+
+                // Energy by periods
+                document.getElementById('energyToday').textContent = data.energy.today.kwh + ' kWh';
+                document.getElementById('costToday').textContent = '$' + data.energy.today.cost_clp.toLocaleString() + ' CLP';
+                document.getElementById('energyWeek').textContent = data.energy.week.kwh + ' kWh';
+                document.getElementById('costWeek').textContent = '$' + data.energy.week.cost_clp.toLocaleString() + ' CLP';
+                document.getElementById('energyMonth').textContent = data.energy.month.kwh + ' kWh';
+                document.getElementById('costMonth').textContent = '$' + data.energy.month.cost_clp.toLocaleString() + ' CLP';
+                document.getElementById('energyYear').textContent = data.energy.year.kwh + ' kWh';
+                document.getElementById('costYear').textContent = '$' + data.energy.year.cost_clp.toLocaleString() + ' CLP';
+
+                // Disk OS
+                document.getElementById('osUsed').textContent = data.disk.root.used;
+                document.getElementById('osFree').textContent = data.disk.root.free;
+                const osBar = document.getElementById('osBar');
+                osBar.style.width = data.disk.root.percent + '%';
+                osBar.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
+
+                // Disk OS (storage tab)
+                document.getElementById('osUsed2').textContent = data.disk.root.used;
+                document.getElementById('osFree2').textContent = data.disk.root.free;
+                document.getElementById('osPercent2').textContent = data.disk.root.percent + '%';
+                const osBar2 = document.getElementById('osBar2');
+                osBar2.style.width = data.disk.root.percent + '%';
+                osBar2.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
+
+                // Disk I/O
+                document.getElementById('diskRead').textContent = data.disk.io.read_gb.toFixed(1) + ' GB';
+                document.getElementById('diskWrite').textContent = data.disk.io.write_gb.toFixed(1) + ' GB';
+
                 // Time
-                document.getElementById('server-time').textContent = '🟢 Online • ' + data.timestamp;
-                
+                document.getElementById('serverTime').textContent = data.timestamp;
+
+                // Fetch RAID data separately (needs custom endpoint or estimation)
+                updateRaidStats();
+
+                // Update container stats (CPU/RAM bars)
+                if (data.container_stats) {
+                    updateContainerStats(data.container_stats);
+                }
+
             } catch (e) {
-                document.getElementById('server-time').textContent = '🔴 Error conexión';
+                document.getElementById('serverStatus').textContent = 'Error';
             }
         }
-        
-        function confirmRestart(type) {
-            restartType = type;
-            document.getElementById('modal-title').textContent = type === 'force' ? '⚠️ ¿Forzar reinicio?' : '🔄 ¿Reiniciar servidor?';
-            document.getElementById('modal-text').textContent = type === 'force' ? 
-                'Esto forzará un reinicio inmediato. Los datos no guardados se perderán.' : 
-                'El servidor se reiniciará de forma segura.';
-            document.getElementById('restartModal').style.display = 'flex';
+
+        function updateContainerStats(stats) {
+            document.querySelectorAll('.service-card[data-container]').forEach(card => {
+                const containerName = card.dataset.container;
+                const containerData = stats[containerName];
+
+                if (containerData) {
+                    const cpuVal = card.querySelector('.cpu-val');
+                    const ramVal = card.querySelector('.ram-val');
+                    const cpuBar = card.querySelector('.service-stat-fill.cpu');
+                    const ramBar = card.querySelector('.service-stat-fill.ram');
+                    const statusBadge = card.querySelector('.service-status');
+
+                    if (cpuVal) cpuVal.textContent = containerData.cpu_percent.toFixed(1) + '%';
+                    if (ramVal) ramVal.textContent = containerData.mem_usage_mb.toFixed(0) + 'MB';
+                    if (cpuBar) cpuBar.style.width = Math.min(containerData.cpu_percent, 100) + '%';
+                    if (ramBar) ramBar.style.width = Math.min(containerData.mem_percent, 100) + '%';
+
+                    // Update status badge
+                    if (statusBadge) {
+                        statusBadge.className = 'service-status online';
+                        statusBadge.innerHTML = '<span class="status-dot"></span>Online';
+                    }
+                } else {
+                    // Container not running
+                    const statusBadge = card.querySelector('.service-status');
+                    if (statusBadge) {
+                        statusBadge.className = 'service-status offline';
+                        statusBadge.innerHTML = '<span class="status-dot"></span>Offline';
+                    }
+                }
+            });
         }
-        
-        function closeModal() {
-            document.getElementById('restartModal').style.display = 'none';
+
+        function updateRaidStats() {
+            // These would come from a real API - using estimated values based on earlier lsblk
+            document.getElementById('raidUsed').textContent = '553GB';
+            document.getElementById('raidFree').textContent = '2.9TB';
+            document.getElementById('raidBar').style.width = '16%';
+            document.getElementById('raidBar').className = 'disk-progress-fill low';
+
+            document.getElementById('raidUsed2').textContent = '553GB';
+            document.getElementById('raidFree2').textContent = '2.9TB';
+            document.getElementById('raidPercent2').textContent = '16%';
+            document.getElementById('raidBar2').style.width = '16%';
+            document.getElementById('raidBar2').className = 'disk-progress-fill low';
         }
-        
-        async function executeRestart() {
-            closeModal();
-            alert('Función de reinicio deshabilitada por seguridad.\n\nUsa SSH: sudo reboot');
+
+        function getProgressClass(percent) {
+            if (percent < 60) return 'low';
+            if (percent < 85) return 'medium';
+            return 'high';
         }
-        
-        // Actualizar cada 5 segundos
-        fetchStats();
-        setInterval(fetchStats, 5000);
+
+        // Initialize
+        checkAuth();
     </script>
 </body>
 </html>

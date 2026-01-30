@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # ========================================
+  # TILESERVER GL - Servidor de tiles/mapas
+  # Puerto: 8082 -> maps.drozast.xyz
+  # (8080 ocupado por pihole)
+  # ========================================
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: maps-tileserver
+    restart: unless-stopped
+    volumes:
+      - ./tileserver:/data
+    ports:
+      - "8082:8080"
+
+  # ========================================
+  # NOMINATIM - Geocoding y busqueda
+  # Puerto: 8081 -> geo.drozast.xyz
+  # ========================================
+  nominatim:
+    image: mediagis/nominatim:4.4
+    container_name: maps-nominatim
+    restart: unless-stopped
+    shm_size: 1gb
+    volumes:
+      - ./nominatim:/var/lib/postgresql/14/main
+    environment:
+      - PBF_URL=https://download.geofabrik.de/south-america/chile-latest.osm.pbf
+      - REPLICATION_URL=https://download.geofabrik.de/south-america/chile-updates/
+      - NOMINATIM_PASSWORD=nominatim123
+      - IMPORT_STYLE=full
+    ports:
+      - "8081:8080"
+
+  # ========================================
+  # OSRM - Routing/Rutas
+  # Puerto: 5000 -> routing.drozast.xyz
+  # ========================================
+  osrm:
+    image: osrm/osrm-backend
+    container_name: maps-osrm
+    restart: unless-stopped
+    volumes:
+      - ./osrm:/data
+    ports:
+      - "5000:5000"
+    command: osrm-routed --algorithm mld /data/chile-latest.osrm
+    depends_on:
+      - osrm-prepare
+
+  # Preparar datos OSRM (solo corre una vez)
+  osrm-prepare:
+    image: osrm/osrm-backend
+    container_name: maps-osrm-prepare
+    volumes:
+      - ./osrm:/data
+    command: >
+      sh -c "
+        if [ ! -f /data/chile-latest.osrm ]; then
+          osrm-extract -p /opt/car.lua /data/chile-latest.osm.pbf &&
+          osrm-partition /data/chile-latest.osrm &&
+          osrm-customize /data/chile-latest.osrm
+        fi
+      "
+    profiles:
+      - setup
