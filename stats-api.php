@@ -12,6 +12,83 @@ $cpu_temp = $cpu_temp ? round($cpu_temp / 1000, 1) : 0;
 $cpu_cores = (int)trim(shell_exec("nproc") ?? "1");
 $load_avg = trim(shell_exec("cat /host/proc/loadavg | awk '{print \$1,\$2,\$3}'") ?? "0 0 0");
 
+// CPU por núcleo - uso
+$cpu_per_core = [];
+$stat_lines = explode("\n", trim(shell_exec("grep '^cpu[0-9]' /host/proc/stat") ?? ""));
+foreach ($stat_lines as $line) {
+    if (preg_match('/^cpu(\d+)\s+(\d+)\s+\d+\s+(\d+)\s+(\d+)/', $line, $m)) {
+        $core_num = (int)$m[1];
+        $user = (int)$m[2];
+        $sys = (int)$m[3];
+        $idle = (int)$m[4];
+        $total = $user + $sys + $idle;
+        $usage = $total > 0 ? round(($user + $sys) * 100 / $total) : 0;
+        $cpu_per_core[$core_num] = ['usage' => $usage];
+    }
+}
+
+// CPU frecuencias por núcleo
+$freq_output = trim(shell_exec("cat /host/sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq 2>/dev/null") ?? "");
+$freqs = explode("\n", $freq_output);
+foreach ($freqs as $i => $freq) {
+    if (isset($cpu_per_core[$i]) && is_numeric($freq)) {
+        $cpu_per_core[$i]['freq_mhz'] = round((int)$freq / 1000);
+    }
+}
+
+// CPU modelo
+$cpu_model = trim(shell_exec("cat /host/proc/cpuinfo | grep 'model name' | head -1 | cut -d':' -f2") ?? "Unknown");
+
+// Temperaturas de CPU por core (coretemp/k10temp)
+$temps_output = trim(shell_exec("cat /host/sys/class/hwmon/hwmon*/temp*_input 2>/dev/null") ?? "");
+$temps_labels = trim(shell_exec("cat /host/sys/class/hwmon/hwmon*/temp*_label 2>/dev/null") ?? "");
+$temp_values = explode("\n", $temps_output);
+$temp_labels_arr = explode("\n", $temps_labels);
+$cpu_temps = [];
+for ($i = 0; $i < count($temp_values); $i++) {
+    $temp = is_numeric($temp_values[$i]) ? round((int)$temp_values[$i] / 1000, 1) : 0;
+    $label = isset($temp_labels_arr[$i]) ? trim($temp_labels_arr[$i]) : "Temp $i";
+    if ($temp > 0) {
+        $cpu_temps[] = ['label' => $label, 'temp' => $temp];
+    }
+}
+
+// GPU NVIDIA (si existe)
+$gpu_info = null;
+$nvidia_check = shell_exec("nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw,fan.speed,clocks.gr,clocks.mem --format=csv,noheader,nounits 2>/dev/null");
+if ($nvidia_check && trim($nvidia_check) !== '') {
+    $gpu_data = str_getcsv(trim($nvidia_check));
+    if (count($gpu_data) >= 9) {
+        $gpu_info = [
+            'name' => trim($gpu_data[0]),
+            'usage' => (int)trim($gpu_data[1]),
+            'mem_used_mb' => (int)trim($gpu_data[2]),
+            'mem_total_mb' => (int)trim($gpu_data[3]),
+            'temp' => (int)trim($gpu_data[4]),
+            'power_w' => round((float)trim($gpu_data[5]), 1),
+            'fan_percent' => (int)trim($gpu_data[6]),
+            'clock_mhz' => (int)trim($gpu_data[7]),
+            'mem_clock_mhz' => (int)trim($gpu_data[8])
+        ];
+    }
+}
+
+// Motherboard / Sensores adicionales
+$motherboard_info = [];
+$mb_name = trim(shell_exec("cat /host/sys/class/dmi/id/board_name 2>/dev/null") ?? "");
+$mb_vendor = trim(shell_exec("cat /host/sys/class/dmi/id/board_vendor 2>/dev/null") ?? "");
+$motherboard_info['name'] = $mb_name ?: 'Unknown';
+$motherboard_info['vendor'] = $mb_vendor ?: 'Unknown';
+
+// Sensores de la placa (voltajes, temperaturas adicionales via lm-sensors)
+$sensors_output = shell_exec("sensors -j 2>/dev/null");
+if ($sensors_output) {
+    $sensors_data = json_decode($sensors_output, true);
+    $motherboard_info['sensors'] = $sensors_data ?: [];
+} else {
+    $motherboard_info['sensors'] = [];
+}
+
 // RAM
 $ram_total = round((int)trim(shell_exec("cat /host/proc/meminfo | grep MemTotal | awk '{print \$2}'") ?? "0") / 1024);
 $ram_available = round((int)trim(shell_exec("cat /host/proc/meminfo | grep MemAvailable | awk '{print \$2}'") ?? "0") / 1024);
@@ -71,95 +148,151 @@ $docker_images = count($images);
 $processes = (int)trim(shell_exec("ls /host/proc | grep -E '^[0-9]+$' | wc -l") ?? "0");
 
 // Energia REAL con registro por periodos (dia, semana, mes, año)
-$base_watts = 45;   // Consumo base servidor idle
-$max_watts = 120;   // Consumo máximo (CPU 100%)
-$current_watts = round($base_watts + (($max_watts - $base_watts) * $cpu / 100), 1);
-$cost_per_kwh = 295; // CLP Chile (tarifa real según boleta: 54200/184=294)
+// Consumo por componente
+$cpu_base_watts = 35;    // CPU idle
+$cpu_max_watts = 95;     // CPU TDP (ajustar según tu CPU)
+$cpu_watts = round($cpu_base_watts + (($cpu_max_watts - $cpu_base_watts) * $cpu / 100), 1);
+
+// GPU watts (real desde nvidia-smi o estimado)
+$gpu_watts = 0;
+if ($gpu_info && isset($gpu_info['power_w'])) {
+    $gpu_watts = $gpu_info['power_w'];
+} else {
+    // Estimación si no hay GPU o no hay lectura
+    $gpu_watts = 15; // GPU integrada o sin GPU
+}
+
+// Placa base, RAM, SSD, ventiladores (estimación)
+$mb_watts = 25;          // Placa base + chipset
+$ram_watts = round($ram_total / 1024 * 3, 1); // ~3W por cada 8GB
+$storage_watts = 8;      // NVMe + HDDs
+$fans_watts = 10;        // Ventiladores
+$other_watts = $mb_watts + $ram_watts + $storage_watts + $fans_watts;
+
+// Total actual
+$current_watts = round($cpu_watts + $gpu_watts + $other_watts, 1);
+$cost_per_kwh = 295; // CLP Chile
+
+// Desglose de consumo
+$power_breakdown = [
+    'cpu' => $cpu_watts,
+    'gpu' => $gpu_watts,
+    'motherboard' => $mb_watts,
+    'ram' => $ram_watts,
+    'storage' => $storage_watts,
+    'fans' => $fans_watts,
+    'total' => $current_watts
+];
 
 $energy_data = file_exists($energy_file) ? json_decode(file_get_contents($energy_file), true) : [];
-if (!is_array($energy_data)) {
+if (!is_array($energy_data) || !isset($energy_data['hourly'])) {
     $energy_data = [
         'readings' => [],
         'last_update' => 0,
-        'daily' => [],      // ['2026-01-10' => kwh]
+        'daily' => [],           // ['2026-01-10' => kwh]
+        'hourly' => [],          // ['2026-01-10-14' => kwh] (por hora del día)
+        'hourly_avg' => [],      // [0-23 => avg watts] promedio por hora
+        'component_daily' => [], // ['2026-01-10' => ['cpu' => kwh, 'gpu' => kwh, ...]]
         'total_kwh' => 0
     ];
 }
 
 $now = time();
 $today = date('Y-m-d', $now);
+$current_hour = date('Y-m-d-H', $now);
+$hour_of_day = (int)date('G', $now); // 0-23
 $last_update = $energy_data['last_update'] ?? 0;
 $time_diff = $last_update > 0 ? ($now - $last_update) : 0;
 
-// Calcular kWh consumidos desde ultima lectura (sin límite de 1 hora)
+// Calcular kWh consumidos desde ultima lectura
 $should_save = false;
-if ($time_diff > 0) {
-    // Usar consumo REAL actual (basado en CPU) para el cálculo
-    // Para períodos largos sin lecturas, usar el promedio de las últimas lecturas si existen
-    if ($time_diff > 3600 && !empty($energy_data['readings'])) {
-        // Calcular promedio de las últimas lecturas disponibles
-        $recent_readings = array_slice($energy_data['readings'], -60); // últimas 60 lecturas (1 hora)
-        $watts_sum = array_sum(array_column($recent_readings, 'watts'));
-        $watts_for_calc = $watts_sum / count($recent_readings);
-    } else {
-        // Usar el consumo actual medido
-        $watts_for_calc = $current_watts;
-    }
-    $kwh_added = $watts_for_calc * ($time_diff / 3600) / 1000;
+if ($time_diff > 0 && $time_diff < 7200) { // máximo 2 horas para evitar datos erróneos
+    $kwh_added = $current_watts * ($time_diff / 3600) / 1000;
+
+    // kWh por componente
+    $cpu_kwh = $cpu_watts * ($time_diff / 3600) / 1000;
+    $gpu_kwh = $gpu_watts * ($time_diff / 3600) / 1000;
+    $other_kwh = $other_watts * ($time_diff / 3600) / 1000;
 
     // Acumular al total
     $energy_data['total_kwh'] = round(($energy_data['total_kwh'] ?? 0) + $kwh_added, 6);
 
-    // Distribuir el consumo en los días que pasaron
-    $start_day = date('Y-m-d', $last_update);
-    $end_day = $today;
-
-    if ($start_day === $end_day) {
-        // Todo el consumo es del mismo día
-        if (!isset($energy_data['daily'][$today])) {
-            $energy_data['daily'][$today] = 0;
-        }
-        $energy_data['daily'][$today] = round($energy_data['daily'][$today] + $kwh_added, 6);
-    } else {
-        // Distribuir entre días
-        $current_time = $last_update;
-        while (date('Y-m-d', $current_time) <= $end_day) {
-            $day = date('Y-m-d', $current_time);
-            $day_end = strtotime($day . ' 23:59:59');
-            $period_end = min($day_end, $now);
-            $period_start = max(strtotime($day . ' 00:00:00'), $last_update);
-            $period_seconds = $period_end - $period_start;
-
-            if ($period_seconds > 0) {
-                $day_kwh = $watts_for_calc * ($period_seconds / 3600) / 1000;
-                if (!isset($energy_data['daily'][$day])) {
-                    $energy_data['daily'][$day] = 0;
-                }
-                $energy_data['daily'][$day] = round($energy_data['daily'][$day] + $day_kwh, 6);
-            }
-            $current_time = strtotime($day . ' +1 day');
-        }
+    // Acumular al día actual
+    if (!isset($energy_data['daily'][$today])) {
+        $energy_data['daily'][$today] = 0;
     }
+    $energy_data['daily'][$today] = round($energy_data['daily'][$today] + $kwh_added, 6);
 
-    // Limpiar días antiguos (mantener 365 días)
+    // Acumular por hora
+    if (!isset($energy_data['hourly'][$current_hour])) {
+        $energy_data['hourly'][$current_hour] = 0;
+    }
+    $energy_data['hourly'][$current_hour] = round($energy_data['hourly'][$current_hour] + $kwh_added, 6);
+
+    // Acumular por componente del día
+    if (!isset($energy_data['component_daily'][$today])) {
+        $energy_data['component_daily'][$today] = ['cpu' => 0, 'gpu' => 0, 'other' => 0];
+    }
+    $energy_data['component_daily'][$today]['cpu'] = round($energy_data['component_daily'][$today]['cpu'] + $cpu_kwh, 6);
+    $energy_data['component_daily'][$today]['gpu'] = round($energy_data['component_daily'][$today]['gpu'] + $gpu_kwh, 6);
+    $energy_data['component_daily'][$today]['other'] = round($energy_data['component_daily'][$today]['other'] + $other_kwh, 6);
+
+    // Limpiar datos antiguos
     $energy_data['daily'] = array_filter($energy_data['daily'], function($key) {
         return strtotime($key) > strtotime('-365 days');
     }, ARRAY_FILTER_USE_KEY);
 
-    $energy_data['last_update'] = $now;
+    // Mantener solo 7 días de datos por hora
+    $energy_data['hourly'] = array_filter($energy_data['hourly'], function($key) {
+        return strtotime(substr($key, 0, 10)) > strtotime('-7 days');
+    }, ARRAY_FILTER_USE_KEY);
+
+    // Mantener 30 días de componentes
+    $energy_data['component_daily'] = array_filter($energy_data['component_daily'], function($key) {
+        return strtotime($key) > strtotime('-30 days');
+    }, ARRAY_FILTER_USE_KEY);
+
     $should_save = true;
 }
 
-// Agregar lectura cada minuto (para historial de 24h)
+$energy_data['last_update'] = $now;
+
+// Agregar lectura cada minuto (para historial de 24h y gráficos)
 if ($time_diff >= 60 || $last_update == 0) {
-    $energy_data['readings'][] = ['time' => $now, 'watts' => $current_watts, 'cpu' => $cpu];
-    if (count($energy_data['readings']) > 1440) array_shift($energy_data['readings']); // 24h de lecturas
+    $energy_data['readings'][] = [
+        'time' => $now,
+        'watts' => $current_watts,
+        'cpu' => $cpu,
+        'cpu_w' => $cpu_watts,
+        'gpu_w' => $gpu_watts
+    ];
+    // Mantener 24h de lecturas (1440 minutos)
+    if (count($energy_data['readings']) > 1440) {
+        array_shift($energy_data['readings']);
+    }
+
+    // Calcular promedio por hora del día (para patrones de uso)
+    if (!isset($energy_data['hourly_avg'])) {
+        $energy_data['hourly_avg'] = array_fill(0, 24, ['sum' => 0, 'count' => 0]);
+    }
+    $energy_data['hourly_avg'][$hour_of_day]['sum'] += $current_watts;
+    $energy_data['hourly_avg'][$hour_of_day]['count']++;
+
     $should_save = true;
 }
 
 // Guardar si hubo cambios
 if ($should_save) {
     @file_put_contents($energy_file, json_encode($energy_data));
+}
+
+// Calcular promedios por hora del día
+$hourly_averages = [];
+if (isset($energy_data['hourly_avg'])) {
+    for ($h = 0; $h < 24; $h++) {
+        $avg_data = $energy_data['hourly_avg'][$h] ?? ['sum' => 0, 'count' => 0];
+        $hourly_averages[$h] = $avg_data['count'] > 0 ? round($avg_data['sum'] / $avg_data['count'], 1) : 0;
+    }
 }
 
 // Calcular consumo por períodos
@@ -201,6 +334,37 @@ $cost_week = round($kwh_week * $cost_per_kwh, 0);
 $cost_month = round($kwh_month * $cost_per_kwh, 0);
 $cost_year = round($kwh_year * $cost_per_kwh, 0);
 $cost_total = round($kwh_total * $cost_per_kwh, 0);
+
+// Consumo por componente del día actual
+$today_components = $energy_data['component_daily'][$today] ?? ['cpu' => 0, 'gpu' => 0, 'other' => 0];
+
+// Historial de las últimas 24 horas (para gráfico)
+$last_24h_readings = array_slice($energy_data['readings'] ?? [], -60); // últimos 60 registros (1 hora si es cada minuto)
+
+// Calcular consumo promedio por hora basado en historial
+$avg_watts_24h = 0;
+if (!empty($energy_data['readings'])) {
+    $watts_sum = array_sum(array_column($energy_data['readings'], 'watts'));
+    $avg_watts_24h = round($watts_sum / count($energy_data['readings']), 1);
+}
+
+// Estimar consumo mensual basado en promedio actual
+$estimated_monthly_kwh = round(($avg_watts_24h * 24 * 30) / 1000, 2);
+$estimated_monthly_cost = round($estimated_monthly_kwh * $cost_per_kwh, 0);
+
+// Historial diario (últimos 7 días para gráfico)
+$daily_history = [];
+for ($i = 6; $i >= 0; $i--) {
+    $day = date('Y-m-d', strtotime("-$i days"));
+    $daily_history[$day] = round($energy_data['daily'][$day] ?? 0, 3);
+}
+
+// Historial por hora del día actual
+$today_hourly = [];
+for ($h = 0; $h < 24; $h++) {
+    $hour_key = $today . '-' . str_pad($h, 2, '0', STR_PAD_LEFT);
+    $today_hourly[$h] = round($energy_data['hourly'][$hour_key] ?? 0, 4);
+}
 
 // Conexiones
 $net_connections = (int)trim(shell_exec("cat /host/proc/net/tcp /host/proc/net/tcp6 2>/dev/null | grep -v local_address | wc -l") ?? "0");
@@ -252,7 +416,15 @@ foreach ($running_containers as $container) {
 
 echo json_encode([
     'timestamp' => date('Y-m-d H:i:s'),
-    'cpu' => ['usage' => $cpu, 'temp' => $cpu_temp, 'cores' => $cpu_cores, 'load' => $load_avg],
+    'cpu' => [
+        'usage' => $cpu,
+        'temp' => $cpu_temp,
+        'cores' => $cpu_cores,
+        'load' => $load_avg,
+        'model' => $cpu_model,
+        'per_core' => $cpu_per_core,
+        'temps' => $cpu_temps
+    ],
     'ram' => ['used_mb' => $ram_used, 'total_mb' => $ram_total, 'percent' => $ram_percent],
     'swap' => ['used_mb' => $swap_used, 'total_mb' => $swap_total],
     'disk' => [
@@ -266,11 +438,21 @@ echo json_encode([
     'processes' => $processes,
     'energy' => [
         'watts' => $current_watts,
+        'breakdown' => $power_breakdown,
         'today' => ['kwh' => $kwh_today, 'cost_clp' => $cost_today],
         'week' => ['kwh' => $kwh_week, 'cost_clp' => $cost_week],
         'month' => ['kwh' => $kwh_month, 'cost_clp' => $cost_month],
         'year' => ['kwh' => $kwh_year, 'cost_clp' => $cost_year],
-        'total' => ['kwh' => $kwh_total, 'cost_clp' => $cost_total]
+        'total' => ['kwh' => $kwh_total, 'cost_clp' => $cost_total],
+        'today_by_component' => $today_components,
+        'avg_watts_24h' => $avg_watts_24h,
+        'estimated_monthly' => ['kwh' => $estimated_monthly_kwh, 'cost_clp' => $estimated_monthly_cost],
+        'daily_history' => $daily_history,
+        'today_hourly' => $today_hourly,
+        'hourly_pattern' => $hourly_averages,
+        'cost_per_kwh' => $cost_per_kwh
     ],
+    'gpu' => $gpu_info,
+    'motherboard' => $motherboard_info,
     'container_stats' => $container_stats
 ]);

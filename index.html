@@ -535,6 +535,58 @@
             color: var(--text-primary);
         }
 
+        .service-link.danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+        }
+
+        .service-link.danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .wolf-sessions {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .wolf-sessions-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .wolf-session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            padding: 4px 0;
+            color: var(--text-secondary);
+        }
+
+        .wolf-session-item .session-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .wolf-session-item .session-ram {
+            color: var(--warning);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .wolf-no-sessions {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
         /* Service Stats Bars */
         .service-stats {
             display: flex;
@@ -717,6 +769,216 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* Hardware Monitor Section */
+        .hardware-section {
+            margin-bottom: 32px;
+        }
+
+        .hardware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .hardware-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .hardware-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hardware-card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hardware-card-title h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .hardware-card-title .subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .hardware-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .hardware-icon.cpu { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .hardware-icon.gpu { background: linear-gradient(135deg, #76b900, #5a8c00); }
+        .hardware-icon.mb { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+
+        .hardware-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hardware-stat {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .hardware-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .hardware-stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CPU Cores Grid */
+        .cores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .core-item {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .core-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .core-num {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .core-usage {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .core-freq {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* GPU Stats */
+        .gpu-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .gpu-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .gpu-bar-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .gpu-bar-track {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .gpu-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .gpu-bar-fill.usage { background: linear-gradient(90deg, #76b900, #5a8c00); }
+        .gpu-bar-fill.memory { background: var(--info); }
+        .gpu-bar-fill.temp { background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); }
+
+        .gpu-bar-value {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Temperature Pills */
+        .temp-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .temp-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .temp-pill-label {
+            color: var(--text-secondary);
+        }
+
+        .temp-pill-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .temp-pill-value.hot {
+            color: var(--danger);
+        }
+
+        .temp-pill-value.warm {
+            color: var(--warning);
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -739,6 +1001,9 @@
             .login-container { padding: 32px 24px; margin: 16px; }
             .disks-grid { grid-template-columns: 1fr; }
             .tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .hardware-grid { grid-template-columns: 1fr; }
+            .hardware-card-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .cores-grid { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -803,7 +1068,7 @@
                         <div class="stat-value" id="cpuValue">--%</div>
                         <div class="stat-label">Uso de CPU</div>
                         <div class="stat-bar"><div class="stat-bar-fill cpu" id="cpuBar" style="width: 0%"></div></div>
-                        <div class="stat-detail" id="cpuDetail">4 cores • --°C</div>
+                        <div class="stat-detail" id="cpuDetail">44 threads • --°C</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header">
@@ -869,7 +1134,9 @@
                     <div class="section-header">
                         <h2 class="section-title">Consumo Energético</h2>
                     </div>
-                    <div class="stats-grid">
+
+                    <!-- Consumo por período -->
+                    <div class="stats-grid" style="margin-bottom: 20px;">
                         <div class="stat-card">
                             <div class="stat-header">
                                 <div class="stat-icon">📅</div>
@@ -903,6 +1170,238 @@
                             <div class="stat-detail" id="costYear">$-- CLP</div>
                         </div>
                     </div>
+
+                    <!-- Desglose y gráficos -->
+                    <div class="hardware-grid">
+                        <!-- Desglose por componente -->
+                        <div class="hardware-card">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">⚡</div>
+                                    <div>
+                                        <h3>Consumo Actual</h3>
+                                        <div class="subtitle" id="totalWattsLabel">-- W Total</div>
+                                    </div>
+                                </div>
+                                <div class="hardware-stats">
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="avgWatts24h">-- W</div>
+                                        <div class="hardware-stat-label">Promedio 24h</div>
+                                    </div>
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="estimatedMonthly">-- kWh</div>
+                                        <div class="hardware-stat-label">Est. Mensual</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Desglose por Componente</div>
+                            <div class="gpu-bars" id="powerBreakdown">
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">CPU</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill" id="cpuWattsBar" style="width: 0%; background: var(--success);"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="cpuWattsVal">-- W</span>
+                                </div>
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">GPU</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill" id="gpuWattsBar" style="width: 0%; background: #76b900;"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="gpuWattsVal">-- W</span>
+                                </div>
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">Placa/RAM</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill" id="mbWattsBar" style="width: 0%; background: var(--accent);"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="mbWattsVal">-- W</span>
+                                </div>
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">Storage</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill" id="storageWattsBar" style="width: 0%; background: var(--info);"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="storageWattsVal">-- W</span>
+                                </div>
+                            </div>
+                            <div class="temp-pills" style="margin-top: 16px;">
+                                <div class="temp-pill">
+                                    <span class="temp-pill-label">Tarifa</span>
+                                    <span class="temp-pill-value" id="costPerKwh">$-- /kWh</span>
+                                </div>
+                                <div class="temp-pill">
+                                    <span class="temp-pill-label">Est. Costo Mes</span>
+                                    <span class="temp-pill-value" id="estimatedMonthlyCost">$--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historial últimos 7 días -->
+                        <div class="hardware-card">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">📈</div>
+                                    <div>
+                                        <h3>Historial Semanal</h3>
+                                        <div class="subtitle">Consumo últimos 7 días</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">kWh por día</div>
+                            <div id="dailyHistoryChart" style="display: flex; align-items: flex-end; gap: 8px; height: 120px; padding: 10px 0;">
+                                <!-- Bars will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Consumo por hora del día -->
+                        <div class="hardware-card">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">🕐</div>
+                                    <div>
+                                        <h3>Patrón de Consumo</h3>
+                                        <div class="subtitle">Promedio por hora del día</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Watts promedio por hora</div>
+                            <div id="hourlyPatternChart" style="display: flex; align-items: flex-end; gap: 2px; height: 80px; padding: 10px 0;">
+                                <!-- Bars will be populated dynamically -->
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                                <span>00:00</span>
+                                <span>06:00</span>
+                                <span>12:00</span>
+                                <span>18:00</span>
+                                <span>23:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware Monitor Section -->
+                <div class="section hardware-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Monitor de Hardware</h2>
+                    </div>
+                    <div class="hardware-grid">
+                        <!-- CPU Card -->
+                        <div class="hardware-card" id="cpuCard">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon cpu">🖥️</div>
+                                    <div>
+                                        <h3>CPU</h3>
+                                        <div class="subtitle" id="cpuModel">Cargando...</div>
+                                    </div>
+                                </div>
+                                <div class="hardware-stats">
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="cpuTotalUsage">--%</div>
+                                        <div class="hardware-stat-label">Uso</div>
+                                    </div>
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="cpuAvgTemp">--°C</div>
+                                        <div class="hardware-stat-label">Temp</div>
+                                    </div>
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="cpuAvgFreq">-- MHz</div>
+                                        <div class="hardware-stat-label">Freq</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Uso por Núcleo</div>
+                            <div class="cores-grid" id="coresGrid">
+                                <!-- Cores will be populated dynamically -->
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 16px; margin-bottom: 8px;">Temperaturas</div>
+                            <div class="temp-pills" id="cpuTempPills">
+                                <!-- Temperature pills will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- GPU Card -->
+                        <div class="hardware-card" id="gpuCard">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon gpu">🎮</div>
+                                    <div>
+                                        <h3>GPU</h3>
+                                        <div class="subtitle" id="gpuModel">Detectando...</div>
+                                    </div>
+                                </div>
+                                <div class="hardware-stats">
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="gpuUsage">--%</div>
+                                        <div class="hardware-stat-label">Uso</div>
+                                    </div>
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="gpuTemp">--°C</div>
+                                        <div class="hardware-stat-label">Temp</div>
+                                    </div>
+                                    <div class="hardware-stat">
+                                        <div class="hardware-stat-value" id="gpuPower">-- W</div>
+                                        <div class="hardware-stat-label">Power</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gpu-bars" id="gpuBars">
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">GPU Core</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill usage" id="gpuUsageBar" style="width: 0%"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="gpuUsageVal">--%</span>
+                                </div>
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">VRAM</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill memory" id="gpuMemBar" style="width: 0%"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="gpuMemVal">-- / -- GB</span>
+                                </div>
+                                <div class="gpu-bar-item">
+                                    <span class="gpu-bar-label">Temperatura</span>
+                                    <div class="gpu-bar-track">
+                                        <div class="gpu-bar-fill temp" id="gpuTempBar" style="width: 0%"></div>
+                                    </div>
+                                    <span class="gpu-bar-value" id="gpuTempVal">--°C</span>
+                                </div>
+                            </div>
+                            <div class="temp-pills" style="margin-top: 16px;">
+                                <div class="temp-pill">
+                                    <span class="temp-pill-label">Clock</span>
+                                    <span class="temp-pill-value" id="gpuClock">-- MHz</span>
+                                </div>
+                                <div class="temp-pill">
+                                    <span class="temp-pill-label">Mem Clock</span>
+                                    <span class="temp-pill-value" id="gpuMemClock">-- MHz</span>
+                                </div>
+                                <div class="temp-pill">
+                                    <span class="temp-pill-label">Fan</span>
+                                    <span class="temp-pill-value" id="gpuFan">--%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Motherboard Card -->
+                        <div class="hardware-card" id="mbCard">
+                            <div class="hardware-card-header">
+                                <div class="hardware-card-title">
+                                    <div class="hardware-icon mb">🔧</div>
+                                    <div>
+                                        <h3>Placa Base</h3>
+                                        <div class="subtitle" id="mbModel">Detectando...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Sensores del Sistema</div>
+                            <div class="temp-pills" id="mbSensors">
+                                <!-- Motherboard sensors will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Quick Disks Overview -->
@@ -916,7 +1415,7 @@
                                 <div class="disk-icon os">💾</div>
                                 <div class="disk-info">
                                     <h3>Sistema Operativo</h3>
-                                    <p>SSD 480GB (Samsung/Kingston)</p>
+                                    <p>NVMe 1TB (Fanxiang S790)</p>
                                 </div>
                             </div>
                             <div class="disk-stats">
@@ -937,7 +1436,7 @@
                                 <div class="disk-progress-fill" id="osBar" style="width: 0%"></div>
                             </div>
                             <div class="disk-details">
-                                <code>/dev/sda</code> → 447GB físico • LVM: <code>ubuntu--vg-ubuntu--lv</code> (437GB asignados)<br>
+                                <code>/dev/sda</code> → 931GB físico • LVM: <code>ubuntu--vg-ubuntu--lv</code> (444GB asignados)<br>
                                 Particiones: /boot/efi (1GB), /boot (2GB), LVM (expandido al máximo)
                             </div>
                         </div>
@@ -946,7 +1445,7 @@
                                 <div class="disk-icon cache">⚡</div>
                                 <div class="disk-info">
                                     <h3>Cache SSD</h3>
-                                    <p>SSD 120GB (bcache)</p>
+                                    <p>Sin cache SSD (bcache directo)</p>
                                 </div>
                             </div>
                             <div class="disk-stats">
@@ -1037,7 +1536,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://api-frogio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://api-frogio.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3110" target="_blank" class="service-link local">Local :3110</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="frogio-web-admin">
@@ -1063,7 +1563,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://admin.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://admin.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3111" target="_blank" class="service-link local">Local :3111</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="frogio-postgres">
@@ -1089,7 +1590,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">PostgreSQL (interno)</span>
+                                <a href="http://192.168.31.145:5432" target="_blank" class="service-link local">Local :5432</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="frogio-redis">
@@ -1115,7 +1616,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Redis (interno)</span>
+                                <a href="http://192.168.31.145:6379" target="_blank" class="service-link local">Local :6379</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="frogio-minio">
@@ -1141,7 +1642,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://minio-frogio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://minio-frogio.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:9011" target="_blank" class="service-link local">Console :9011</a>
                             </div>
                         </div>
                     </div>
@@ -1177,7 +1679,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://todoapp.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://todoapp.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3005" target="_blank" class="service-link local">Local :3005</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="natik-travel">
@@ -1203,7 +1706,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://natik.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://natik.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3100" target="_blank" class="service-link local">Local :3100</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="miseenplace-restaurant">
@@ -1229,7 +1733,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://miseenplace.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://miseenplace.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3001" target="_blank" class="service-link local">Local :3001</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="reclamaya-web">
@@ -1255,7 +1760,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://reclamaya.cl" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://reclamaya.cl" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3021" target="_blank" class="service-link local">Local :3021</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="wms-app">
@@ -1281,7 +1787,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://wms.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://wms.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3002" target="_blank" class="service-link local">Local :3002</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="supertools-app">
@@ -1307,7 +1814,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                                <a href="http://192.168.31.145:3050" target="_blank" class="service-link local">Local :3050</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="barberbook-frontend">
@@ -1333,7 +1840,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                                <a href="http://192.168.31.145:3030" target="_blank" class="service-link local">Local :3030</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="casainfante-frontend">
@@ -1359,7 +1866,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                                <a href="http://192.168.31.145:3040" target="_blank" class="service-link local">Local :3040</a>
                             </div>
                         </div>
                     </div>
@@ -1395,7 +1902,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://cloud.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://cloud.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:10081" target="_blank" class="service-link local">Local :10081</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="nextcloud-db">
@@ -1421,7 +1929,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">PostgreSQL (interno)</span>
+                                <a href="#" class="service-link local">PostgreSQL</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="minio">
@@ -1447,7 +1955,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://minio.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://minio.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:9003" target="_blank" class="service-link local">Console :9003</a>
                             </div>
                         </div>
                     </div>
@@ -1483,7 +1992,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://music.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://music.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:4533" target="_blank" class="service-link local">Local :4533</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="kavita">
@@ -1509,7 +2019,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://books.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://books.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:5555" target="_blank" class="service-link local">Local :5555</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="metube">
@@ -1535,7 +2046,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://videos.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://videos.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8084" target="_blank" class="service-link local">Local :8084</a>
                             </div>
                         </div>
                     </div>
@@ -1545,35 +2057,9 @@
                     <div class="category-header">
                         <div class="category-icon">🛠️</div>
                         <span class="category-title">Herramientas & Dev</span>
-                        <span class="category-count">4 servicios</span>
+                        <span class="category-count">2 servicios</span>
                     </div>
                     <div class="services-grid">
-                        <div class="service-card" data-container="stirling-pdf">
-                            <div class="service-header">
-                                <div class="service-icon">📄</div>
-                                <div class="service-info">
-                                    <h3>Stirling PDF</h3>
-                                    <p>Herramientas PDF</p>
-                                </div>
-                                <span class="service-status online"><span class="status-dot"></span>Online</span>
-                            </div>
-                            <div class="service-description">
-                                Suite completa PDF: unir, dividir, comprimir, OCR, convertir.
-                            </div>
-                            <div class="service-stats">
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
-                                </div>
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
-                                </div>
-                            </div>
-                            <div class="service-links">
-                                <a href="https://pdf.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
-                            </div>
-                        </div>
                         <div class="service-card" data-container="gitea">
                             <div class="service-header">
                                 <div class="service-icon">🐙</div>
@@ -1597,7 +2083,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://git.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://git.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:3003" target="_blank" class="service-link local">Local :3003</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="mailpit">
@@ -1623,33 +2110,7 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
-                            </div>
-                        </div>
-                        <div class="service-card" data-container="netflix-backup">
-                            <div class="service-header">
-                                <div class="service-icon">🎬</div>
-                                <div class="service-info">
-                                    <h3>Netflix Backup</h3>
-                                    <p>Backup Service</p>
-                                </div>
-                                <span class="service-status online"><span class="status-dot"></span>Online</span>
-                            </div>
-                            <div class="service-description">
-                                Servicio de backup para cuentas Netflix.
-                            </div>
-                            <div class="service-stats">
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
-                                </div>
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
-                                </div>
-                            </div>
-                            <div class="service-links">
-                                <span class="service-link local" style="cursor: default;">Solo via SSH</span>
+                                <a href="http://192.168.31.145:8025" target="_blank" class="service-link local">Local :8025</a>
                             </div>
                         </div>
                     </div>
@@ -1685,7 +2146,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://portainer.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://portainer.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:9000" target="_blank" class="service-link local">Local :9000</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="pihole">
@@ -1711,7 +2173,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://pihole.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://pihole.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8080" target="_blank" class="service-link local">Local :8080</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="cloudflared">
@@ -1763,7 +2226,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://stats.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://stats.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8095" target="_blank" class="service-link local">Local :8095</a>
                             </div>
                         </div>
                     </div>
@@ -1773,35 +2237,9 @@
                     <div class="category-header">
                         <div class="category-icon">🔐</div>
                         <span class="category-title">Seguridad & URLs</span>
-                        <span class="category-count">4 servicios</span>
+                        <span class="category-count">3 servicios</span>
                     </div>
                     <div class="services-grid">
-                        <div class="service-card" data-container="vaultwarden">
-                            <div class="service-header">
-                                <div class="service-icon">🔑</div>
-                                <div class="service-info">
-                                    <h3>Vaultwarden</h3>
-                                    <p>Password Manager</p>
-                                </div>
-                                <span class="service-status online"><span class="status-dot"></span>Online</span>
-                            </div>
-                            <div class="service-description">
-                                Gestor de contraseñas compatible con Bitwarden.
-                            </div>
-                            <div class="service-stats">
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
-                                </div>
-                                <div class="service-stat">
-                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
-                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
-                                </div>
-                            </div>
-                            <div class="service-links">
-                                <a href="https://vault.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
-                            </div>
-                        </div>
                         <div class="service-card" data-container="shlink">
                             <div class="service-header">
                                 <div class="service-icon">🔗</div>
@@ -1825,7 +2263,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://qr.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://qr.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8090" target="_blank" class="service-link local">Local :8090</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="shlink-web">
@@ -1851,7 +2290,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://qr-admin.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://qr-admin.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8091" target="_blank" class="service-link local">Local :8091</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="ntfy">
@@ -1877,7 +2317,50 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://ntfy.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://ntfy.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8089" target="_blank" class="service-link local">Local :8089</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header">
+                        <div class="category-icon">🎮</div>
+                        <span class="category-title">Cloud Gaming (GeForce NOW Self-Hosted)</span>
+                        <span class="category-count">1 servicio</span>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card" data-container="wolf-gaming" id="wolfCard">
+                            <div class="service-header">
+                                <div class="service-icon">🐺</div>
+                                <div class="service-info">
+                                    <h3>Wolf Gaming</h3>
+                                    <p>Cloud Gaming Server</p>
+                                </div>
+                                <span class="service-status online"><span class="status-dot"></span>Online</span>
+                            </div>
+                            <div class="service-description">
+                                Tu propio GeForce NOW. Steam, RetroArch, emuladores. Streaming via Moonlight a celular, tablet y PC.
+                            </div>
+                            <div class="service-stats">
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>CPU</span><span class="cpu-val">--%</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill cpu" style="width: 0%"></div></div>
+                                </div>
+                                <div class="service-stat">
+                                    <div class="service-stat-label"><span>RAM</span><span class="ram-val">--MB</span></div>
+                                    <div class="service-stat-bar"><div class="service-stat-fill ram" style="width: 0%"></div></div>
+                                </div>
+                            </div>
+                            <div class="wolf-sessions" id="wolfSessions">
+                                <div class="wolf-sessions-title">Sesiones activas</div>
+                                <div id="wolfSessionsList" class="wolf-no-sessions">Sin sesiones</div>
+                            </div>
+                            <div class="service-links">
+                                <a href="https://47984" target="_blank" class="service-link web">HTTPS :47984</a>
+                                <a href="http://192.168.31.145:47989" target="_blank" class="service-link local">Local :47989</a>
+                                <a onclick="stopWolfSessions()" class="service-link danger" id="wolfStopBtn" style="display:none">Detener sesiones</a>
                             </div>
                         </div>
                     </div>
@@ -1900,7 +2383,7 @@
                                 <span class="service-status online"><span class="status-dot"></span>Online</span>
                             </div>
                             <div class="service-description">
-                                Servidor de tiles de mapas. Reemplazo de Google Maps JS API. Sirve mapas visuales de Chile via OpenStreetMap.
+                                Servidor de vector tiles OpenMapTiles. Reemplazo de Google Maps JS API. Mapas de Chile con calles, ciudades, POIs.
                             </div>
                             <div class="service-stats">
                                 <div class="service-stat">
@@ -1913,7 +2396,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://maps.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://maps.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8082" target="_blank" class="service-link local">Local :8082</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="maps-nominatim">
@@ -1926,7 +2410,7 @@
                                 <span class="service-status online"><span class="status-dot"></span>Online</span>
                             </div>
                             <div class="service-description">
-                                Geocoding y busqueda de direcciones. Reemplazo de Google Geocoding API. Convierte direcciones a coordenadas y viceversa.
+                                Geocoding y busqueda de direcciones. Reemplazo de Google Geocoding API. Direccion a coordenadas y viceversa.
                             </div>
                             <div class="service-stats">
                                 <div class="service-stat">
@@ -1939,7 +2423,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://geo.drozast.xyz/status" target="_blank" class="service-link web">Status</a>
+                                <a href="https://geo.drozast.xyz/status" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:8081" target="_blank" class="service-link local">Local :8081</a>
                             </div>
                         </div>
                         <div class="service-card" data-container="maps-osrm">
@@ -1952,7 +2437,7 @@
                                 <span class="service-status online"><span class="status-dot"></span>Online</span>
                             </div>
                             <div class="service-description">
-                                Calculo de rutas y distancias. Reemplazo de Google Directions API. Rutas en auto, matriz de distancias, punto mas cercano.
+                                Calculo de rutas y distancias. Reemplazo de Google Directions API. Rutas en auto, matriz de distancias.
                             </div>
                             <div class="service-stats">
                                 <div class="service-stat">
@@ -1965,7 +2450,8 @@
                                 </div>
                             </div>
                             <div class="service-links">
-                                <a href="https://routing.drozast.xyz" target="_blank" class="service-link web">Abrir</a>
+                                <a href="https://routing.drozast.xyz" target="_blank" class="service-link web">Internet</a>
+                                <a href="http://192.168.31.145:5000" target="_blank" class="service-link local">Local :5000</a>
                             </div>
                         </div>
                     </div>
@@ -1983,8 +2469,8 @@
                             <div class="disk-header">
                                 <div class="disk-icon os">💾</div>
                                 <div class="disk-info">
-                                    <h3>Disco Sistema (SDA)</h3>
-                                    <p>SSD 480GB - Sistema Operativo</p>
+                                    <h3>Disco Sistema (NVMe)</h3>
+                                    <p>NVMe 1TB - Sistema Operativo</p>
                                 </div>
                             </div>
                             <div class="disk-stats">
@@ -2005,11 +2491,11 @@
                                 <div class="disk-progress-fill" id="osBar2" style="width: 0%"></div>
                             </div>
                             <div class="disk-details">
-                                <strong>Dispositivo:</strong> <code>/dev/sda</code> (447.1GB físico)<br><br>
+                                <strong>Dispositivo:</strong> <code>/dev/nvme0n1</code> (931.5GB físico)<br><br>
                                 <strong>Particiones:</strong><br>
-                                • <code>/dev/sda1</code> - 1GB - /boot/efi (VFAT)<br>
-                                • <code>/dev/sda2</code> - 2GB - /boot (ext4)<br>
-                                • <code>/dev/sda3</code> - 444GB - LVM<br><br>
+                                • <code>/dev/nvme0n1p1</code> - 1GB - /boot/efi (VFAT)<br>
+                                • <code>/dev/nvme0n1p2</code> - 2GB - /boot (ext4)<br>
+                                • <code>/dev/nvme0n1p3</code> - 444GB - LVM<br><br>
                                 <strong>LVM:</strong> <code>ubuntu--vg-ubuntu--lv</code><br>
                                 • Asignado: 437GB (expandido al máximo)<br>
                                 • Espacio utilizado dinámicamente por Docker y servicios
@@ -2020,7 +2506,7 @@
                                 <div class="disk-icon cache">⚡</div>
                                 <div class="disk-info">
                                     <h3>Cache SSD (SDB)</h3>
-                                    <p>SSD 120GB - bcache</p>
+                                    <p>Sin cache SSD activo</p>
                                 </div>
                             </div>
                             <div class="disk-stats">
@@ -2053,7 +2539,7 @@
                             <div class="disk-header">
                                 <div class="disk-icon raid">🛡️</div>
                                 <div class="disk-info">
-                                    <h3>RAID 1 Datos (SDC + SDD)</h3>
+                                    <h3>RAID 1 Datos (SDA + SDB)</h3>
                                     <p>2x 4TB HDD en Espejo</p>
                                 </div>
                             </div>
@@ -2076,8 +2562,8 @@
                             </div>
                             <div class="disk-details">
                                 <strong>Dispositivos:</strong><br>
-                                • <code>/dev/sdc</code> - 3.6TB (Disco 1)<br>
-                                • <code>/dev/sdd</code> - 3.6TB (Disco 2)<br><br>
+                                • <code>/dev/sda</code> - 3.6TB (WD Purple)<br>
+                                • <code>/dev/sdb</code> - 3.6TB (WD Purple)<br><br>
                                 <strong>RAID:</strong> <code>/dev/md0</code> (linux_raid_member)<br>
                                 • Tipo: RAID 1 (Espejo/Mirror)<br>
                                 • Los datos se duplican en ambos discos<br>
@@ -2118,24 +2604,20 @@
                         </button>
                     </div>
                     <pre class="context-code" id="serverContext"><span class="section-label"># ═══════════════════════════════════════════════════════════════════════════════</span>
-<span class="section-label"># DROZAST SERVER - CONTEXTO PARA DESARROLLO EN EQUIPO</span>
+<span class="section-label"># DROZAST SERVER - CONTEXTO PARA DESARROLLO</span>
 <span class="section-label"># ═══════════════════════════════════════════════════════════════════════════════</span>
 
-<span class="comment"># ACCESO SSH (VIA CLOUDFLARE - ACCESO REMOTO DESDE CUALQUIER UBICACION)</span>
-<span class="key">SSH_HOST</span>=<span class="value">"ssh.drozast.xyz"</span>
+<span class="comment"># ACCESO SSH</span>
+<span class="key">IP_LOCAL</span>=<span class="value">"192.168.31.145"</span>
+<span class="key">IP_PUBLICA</span>=<span class="value">"190.5.35.110"</span>
 <span class="key">SSH_USER</span>=<span class="value">"drozast"</span>
 <span class="key">SSH_PASS</span>=<span class="value">"123"</span>
+<span class="key">SSH_TUNNEL</span>=<span class="value">"ssh.drozast.xyz"</span>
 
-<span class="comment"># REQUISITO: Instalar cloudflared</span>
-<span class="comment"># macOS:   brew install cloudflared</span>
-<span class="comment"># Linux:   https://github.com/cloudflare/cloudflared/releases</span>
-<span class="comment"># Windows: https://github.com/cloudflare/cloudflared/releases</span>
-
-<span class="comment"># COMANDO DE CONEXION SSH:</span>
-<span class="key">ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.drozast.xyz" drozast@ssh.drozast.xyz</span>
-
-<span class="comment"># CON SSHPASS (automatizado):</span>
-<span class="key">sshpass -p '123' ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.drozast.xyz" -o StrictHostKeyChecking=no drozast@ssh.drozast.xyz</span>
+<span class="comment"># Conexión local:</span>
+<span class="comment"># ssh drozast@192.168.31.145</span>
+<span class="comment"># Conexión por internet (Cloudflare Tunnel):</span>
+<span class="comment"># cloudflared access ssh --hostname ssh.drozast.xyz</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="section-label"># CLOUDFLARE TUNNEL</span>
@@ -2153,27 +2635,24 @@
 <span class="key">storage.reclamaya.cl</span>   → <span class="value">localhost:9002 (MinIO)</span>
 <span class="key">wms.drozast.xyz</span>        → <span class="value">localhost:3002</span>
 <span class="key">todoapp.drozast.xyz</span>    → <span class="value">localhost:3011 (web) / :3005 (api)</span>
-<span class="key">maps.drozast.xyz</span>       → <span class="value">localhost:8082 (TileServer GL)</span>
-<span class="key">geo.drozast.xyz</span>        → <span class="value">localhost:8081 (Nominatim)</span>
-<span class="key">routing.drozast.xyz</span>    → <span class="value">localhost:5000 (OSRM)</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="section-label"># ALMACENAMIENTO</span>
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="comment"># SSD OS (480GB)</span>
-<span class="key">DISK_OS</span>=<span class="value">"/dev/sda"</span>
-<span class="key">DISK_OS_SIZE</span>=<span class="value">"447GB (437GB asignados vía LVM - expandido)"</span>
+<span class="key">DISK_OS</span>=<span class="value">"/dev/nvme0n1"</span>
+<span class="key">DISK_OS_SIZE</span>=<span class="value">"447GB (444GB asignados vía LVM - expandido)"</span>
 <span class="key">DISK_OS_MOUNT</span>=<span class="value">"/"</span>
 <span class="key">DISK_OS_LVM</span>=<span class="value">"ubuntu--vg-ubuntu--lv"</span>
 
-<span class="comment"># SSD Cache (120GB)</span>
-<span class="key">DISK_CACHE</span>=<span class="value">"/dev/sdb"</span>
-<span class="key">DISK_CACHE_SIZE</span>=<span class="value">"112GB"</span>
-<span class="key">DISK_CACHE_TYPE</span>=<span class="value">"bcache (cache para RAID)"</span>
+<span class="comment"># RAID HDD (sin cache SSD activo)</span>
+<span class="key">DISK_CACHE</span>=<span class="value">"(desconectado)"</span>
+<span class="key">DISK_CACHE_SIZE</span>=<span class="value">"N/A"</span>
+<span class="key">DISK_CACHE_TYPE</span>=<span class="value">"bcache sin cache SSD"</span>
 
 <span class="comment"># RAID 1 (4TB x2 = 3.6TB útil)</span>
-<span class="key">DISK_RAID_1</span>=<span class="value">"/dev/sdc"</span>
-<span class="key">DISK_RAID_2</span>=<span class="value">"/dev/sdd"</span>
+<span class="key">DISK_RAID_1</span>=<span class="value">"/dev/sda"</span>
+<span class="key">DISK_RAID_2</span>=<span class="value">"/dev/sdb"</span>
 <span class="key">DISK_RAID_DEVICE</span>=<span class="value">"/dev/md0"</span>
 <span class="key">DISK_RAID_BCACHE</span>=<span class="value">"/dev/bcache0"</span>
 <span class="key">DISK_RAID_MOUNT</span>=<span class="value">"/mnt/nextcloud-data"</span>
@@ -2185,13 +2664,15 @@
 <span class="comment"># MinIO Principal</span>
 <span class="key">MINIO_USER</span>=<span class="value">"admin"</span>
 <span class="key">MINIO_PASS</span>=<span class="value">"Y5/iqYWfm7MjHx8V1pHNRNgnJe7F7Mz1SJ3n9LK5+Lk="</span>
-<span class="key">MINIO_PUBLIC</span>=<span class="value">"https://minio.drozast.xyz"</span>
-<span class="key">MINIO_RECLAMAYA</span>=<span class="value">"https://storage.reclamaya.cl"</span>
+<span class="key">MINIO_CONSOLE</span>=<span class="value">"http://192.168.31.145:9003"</span>
+<span class="key">MINIO_API</span>=<span class="value">"http://192.168.31.145:9002"</span>
+<span class="key">MINIO_PUBLIC</span>=<span class="value">"https://storage.reclamaya.cl"</span>
 
 <span class="comment"># MinIO Frogio</span>
 <span class="key">FROGIO_MINIO_USER</span>=<span class="value">"frogio_admin"</span>
 <span class="key">FROGIO_MINIO_PASS</span>=<span class="value">"frogio_secret_key_2024"</span>
-<span class="key">FROGIO_MINIO_PUBLIC</span>=<span class="value">"https://minio-frogio.drozast.xyz"</span>
+<span class="key">FROGIO_MINIO_CONSOLE</span>=<span class="value">"http://192.168.31.145:9011"</span>
+<span class="key">FROGIO_MINIO_API</span>=<span class="value">"http://192.168.31.145:9010"</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="section-label"># BASES DE DATOS</span>
@@ -2206,123 +2687,116 @@
 <span class="key">REDIS_BARBERBOOK</span>=<span class="value">"barberbook-redis"</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
-<span class="section-label"># SERVICIOS PUBLICOS (VIA CLOUDFLARE)</span>
+<span class="section-label"># PUERTOS LOCALES COMUNES</span>
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
-<span class="key">api-frogio.drozast.xyz</span>    → <span class="value">Frogio API (NestJS)</span>
-<span class="key">admin.drozast.xyz</span>         → <span class="value">Frogio Admin Panel</span>
-<span class="key">miseenplace.drozast.xyz</span>   → <span class="value">Mise en Place</span>
-<span class="key">wms.drozast.xyz</span>           → <span class="value">WMS Troya</span>
-<span class="key">git.drozast.xyz</span>           → <span class="value">Gitea</span>
-<span class="key">todoapp.drozast.xyz</span>       → <span class="value">TodoApp</span>
-<span class="key">reclamaya.cl</span>              → <span class="value">Reclama Ya Web</span>
-<span class="key">api.reclamaya.cl</span>          → <span class="value">Reclama Ya API</span>
-<span class="key">natik.drozast.xyz</span>         → <span class="value">Natik Travel</span>
-<span class="key">music.drozast.xyz</span>         → <span class="value">Navidrome</span>
-<span class="key">books.drozast.xyz</span>         → <span class="value">Kavita</span>
-<span class="key">videos.drozast.xyz</span>        → <span class="value">MeTube</span>
-<span class="key">pdf.drozast.xyz</span>           → <span class="value">Stirling PDF</span>
-<span class="key">pihole.drozast.xyz</span>        → <span class="value">Pi-hole</span>
-<span class="key">ntfy.drozast.xyz</span>          → <span class="value">Ntfy</span>
-<span class="key">qr.drozast.xyz</span>            → <span class="value">Shlink</span>
-<span class="key">qr-admin.drozast.xyz</span>      → <span class="value">Shlink Admin</span>
-<span class="key">vault.drozast.xyz</span>         → <span class="value">Vaultwarden</span>
-<span class="key">portainer.drozast.xyz</span>     → <span class="value">Portainer</span>
-<span class="key">minio.drozast.xyz</span>         → <span class="value">MinIO Console</span>
-<span class="key">cloud.drozast.xyz</span>         → <span class="value">Nextcloud</span>
-<span class="key">stats.drozast.xyz</span>         → <span class="value">Stats API (este dashboard)</span>
-<span class="key">maps.drozast.xyz</span>          → <span class="value">TileServer GL (Mapas visuales)</span>
-<span class="key">geo.drozast.xyz</span>           → <span class="value">Nominatim (Geocoding API)</span>
-<span class="key">routing.drozast.xyz</span>       → <span class="value">OSRM (Routing/Rutas API)</span>
+<span class="comment"># === PROYECTOS CLIENTES ===</span>
+<span class="key">3002</span> → <span class="value">WMS Troya</span>
+<span class="key">3020</span> → <span class="value">Reclamaya API</span>
+<span class="key">3021</span> → <span class="value">Reclamaya Web</span>
+<span class="key">3026</span> → <span class="value">Reclamaya WhatsApp</span>
+<span class="key">3025</span> → <span class="value">Frogio Landing</span>
+<span class="key">3110</span> → <span class="value">Frogio API</span>
+<span class="key">3111</span> → <span class="value">Frogio Admin</span>
+<span class="key">3004</span> → <span class="value">Frogio Uptime (Kuma)</span>
+<span class="key">3040</span> → <span class="value">Casa Infante Frontend</span>
+<span class="key">3041</span> → <span class="value">Casa Infante API</span>
+<span class="key">3030</span> → <span class="value">BarberBook Frontend</span>
+<span class="key">3031</span> → <span class="value">BarberBook Dashboard</span>
+<span class="key">4000</span> → <span class="value">BarberBook API</span>
+<span class="key">3060</span> → <span class="value">House Advisor API</span>
+<span class="key">3061</span> → <span class="value">House Advisor Web</span>
+
+<span class="comment"># === HERRAMIENTAS ===</span>
+<span class="key">3006</span> → <span class="value">TodoApp API</span>
+<span class="key">3050</span> → <span class="value">SuperTools</span>
+<span class="key">5100</span> → <span class="value">SuperTools Python</span>
+
+<span class="comment"># === INFRAESTRUCTURA ===</span>
+<span class="key">3003</span> → <span class="value">Gitea</span>
+<span class="key">5678</span> → <span class="value">n8n Automation</span>
+<span class="key">8025</span> → <span class="value">Mailpit</span>
+<span class="key">10081</span> → <span class="value">Nextcloud</span>
+<span class="key">8090</span> → <span class="value">Shlink</span>
+<span class="key">8091</span> → <span class="value">Shlink Admin</span>
+
+<span class="comment"># === MAPAS ===</span>
+<span class="key">8081</span> → <span class="value">Nominatim Geocoding</span>
+<span class="key">8082</span> → <span class="value">TileServer GL</span>
+<span class="key">5000</span> → <span class="value">OSRM Routing</span>
+
+<span class="comment"># === STORAGE (MinIO) ===</span>
+<span class="key">9020</span> → <span class="value">Casa Infante MinIO</span>
+<span class="key">9100</span> → <span class="value">Frogio MinIO</span>
+
+<span class="comment"># === WOLF GAMING ===</span>
+<span class="key">47984</span> → <span class="value">Wolf HTTPS (Moonlight)</span>
+<span class="key">47989</span> → <span class="value">Wolf HTTP (Discovery)</span>
+
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="section-label"># CLOUD GAMING (GeForce NOW Self-Hosted)</span>
+<span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
+<span class="comment"># Stack: Wolf (Games on Whales) + Moonlight protocol</span>
+<span class="comment"># GPU: AMD Radeon RX 570/580 (VAAPI + AMF H.264/H.265)</span>
+<span class="comment"># Docker compose: ~/gaming/docker-compose.yml</span>
+<span class="comment"># Config: ~/gaming/apps/cfg/config.toml</span>
+
+<span class="comment"># Apps disponibles:</span>
+<span class="comment">#   Steam, RetroArch, EmulationStation, Firefox,</span>
+<span class="comment">#   Pegasus, Lutris, PrismLauncher (Minecraft),</span>
+<span class="comment">#   Desktop XFCE, Kodi</span>
+
+<span class="comment"># Puertos Wolf:</span>
+<span class="key">TCP_47984</span>=<span class="value">"HTTPS (Moonlight pairing)"</span>
+<span class="key">TCP_47989</span>=<span class="value">"HTTP (Discovery/mDNS)"</span>
+<span class="key">TCP_48010</span>=<span class="value">"RTSP (Video stream setup)"</span>
+<span class="key">UDP_47999</span>=<span class="value">"Control (input/gamepad)"</span>
+<span class="key">UDP_48100</span>=<span class="value">"RTP (Video stream)"</span>
+<span class="key">UDP_48200</span>=<span class="value">"RTP (Audio stream)"</span>
+
+<span class="comment"># Como conectar:</span>
+<span class="comment"># 1. Instalar Moonlight en celular/tablet/PC</span>
+<span class="comment"># 2. Agregar host: 192.168.31.145</span>
+<span class="comment"># 3. Aparece PIN en logs: docker logs wolf-gaming</span>
+<span class="comment"># 4. Ingresar PIN en Moonlight para parear</span>
+<span class="comment"># 5. Seleccionar app (Steam, RetroArch, etc.)</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="section-label"># MAPAS SELF-HOSTED (Alternativa a Google Maps - Solo Chile)</span>
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="comment"># Stack: TileServer GL + Nominatim + OSRM</span>
-<span class="comment"># Datos: OpenStreetMap Chile (~300MB PBF, ~500MB mbtiles)</span>
-<span class="comment"># Formato: Vector tiles (OpenMapTiles schema, protobuf)</span>
-<span class="comment"># RAM estimada: ~4-5 GB total para los 3 servicios</span>
+<span class="comment"># Datos: OpenStreetMap Chile (~500MB mbtiles, vector tiles OpenMapTiles)</span>
 <span class="comment"># Docker compose: ~/maps/docker-compose.yml</span>
 <span class="comment"># Puertos: TileServer=8082, Nominatim=8081, OSRM=5000</span>
 
-<span class="comment"># CAPAS DISPONIBLES EN VECTOR TILES (OpenMapTiles):</span>
-<span class="comment"># place            → Ciudades, pueblos, aldeas (z0-14)</span>
-<span class="comment"># transportation   → Calles, carreteras, vias (z4-14)</span>
-<span class="comment"># transportation_name → Nombres de calles (z8-14)</span>
-<span class="comment"># poi              → Puntos de interes: comercios, hospitales, etc (z12-14)</span>
-<span class="comment"># housenumber      → Numeros de casa (z14)</span>
-<span class="comment"># building         → Edificaciones (z13-14)</span>
-<span class="comment"># water            → Rios, lagos, oceano (z6-14)</span>
-<span class="comment"># water_name       → Nombres de cuerpos de agua (z14)</span>
-<span class="comment"># waterway         → Cursos de agua (z8-14)</span>
-<span class="comment"># boundary         → Limites administrativos (z0-14)</span>
-<span class="comment"># landuse          → Uso de suelo: residencial, comercial (z4-14)</span>
-<span class="comment"># landcover        → Cobertura: bosque, pasto, nieve (z0-14)</span>
-<span class="comment"># park             → Parques y areas verdes (z11-14)</span>
-<span class="comment"># aeroway          → Pistas de aeropuerto (z11-14)</span>
-<span class="comment"># aerodrome_label  → Nombres de aeropuertos (z10-14)</span>
-<span class="comment"># mountain_peak    → Cumbres y montanas (z11-14)</span>
+<span class="comment"># Capas: place, transportation, transportation_name, poi, housenumber,</span>
+<span class="comment">#        building, water, water_name, waterway, boundary, landuse,</span>
+<span class="comment">#        landcover, park, aeroway, aerodrome_label, mountain_peak</span>
 
-<span class="comment"># ENDPOINTS DISPONIBLES:</span>
-
-<span class="comment"># TileServer GL - Mapas visuales (reemplazo Google Maps JS)</span>
+<span class="comment"># ENDPOINTS:</span>
 <span class="key">MAPS_URL</span>=<span class="value">"https://maps.drozast.xyz"</span>
 <span class="key">MAPS_STYLE</span>=<span class="value">"https://maps.drozast.xyz/styles/osm-bright/style.json"</span>
 <span class="key">MAPS_TILES_RASTER</span>=<span class="value">"https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png"</span>
 <span class="key">MAPS_TILES_VECTOR</span>=<span class="value">"https://maps.drozast.xyz/data/v3/{z}/{x}/{y}.pbf"</span>
-<span class="key">MAPS_TILEJSON</span>=<span class="value">"https://maps.drozast.xyz/data/v3.json"</span>
-
-<span class="comment"># Nominatim - Geocoding (reemplazo Google Geocoding API)</span>
-<span class="key">GEO_URL</span>=<span class="value">"https://geo.drozast.xyz"</span>
 <span class="key">GEO_SEARCH</span>=<span class="value">"https://geo.drozast.xyz/search?q={direccion}&format=json&countrycodes=cl"</span>
 <span class="key">GEO_REVERSE</span>=<span class="value">"https://geo.drozast.xyz/reverse?lat={lat}&lon={lon}&format=json"</span>
-<span class="key">GEO_STATUS</span>=<span class="value">"https://geo.drozast.xyz/status"</span>
-
-<span class="comment"># OSRM - Routing (reemplazo Google Directions API)</span>
-<span class="key">ROUTING_URL</span>=<span class="value">"https://routing.drozast.xyz"</span>
-<span class="key">ROUTING_ROUTE</span>=<span class="value">"https://routing.drozast.xyz/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson&steps=true"</span>
+<span class="key">ROUTING_ROUTE</span>=<span class="value">"https://routing.drozast.xyz/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?overview=full&geometries=geojson"</span>
 <span class="key">ROUTING_TABLE</span>=<span class="value">"https://routing.drozast.xyz/table/v1/driving/{coords}"</span>
-<span class="key">ROUTING_NEAREST</span>=<span class="value">"https://routing.drozast.xyz/nearest/v1/driving/{lon},{lat}"</span>
 
-<span class="comment"># EJEMPLO JAVASCRIPT CON MAPLIBRE GL (vector tiles, mejor rendimiento):</span>
-<span class="comment"># const map = new maplibregl.Map({</span>
-<span class="comment">#   container: 'map',</span>
-<span class="comment">#   style: 'https://maps.drozast.xyz/styles/osm-bright/style.json',</span>
-<span class="comment">#   center: [-70.669, -33.449], // Santiago</span>
-<span class="comment">#   zoom: 12</span>
-<span class="comment"># });</span>
-<span class="comment"># // CDN: &lt;script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"&gt;&lt;/script&gt;</span>
-<span class="comment"># // CSS: &lt;link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"&gt;</span>
-
-<span class="comment"># EJEMPLO JAVASCRIPT CON LEAFLET (raster tiles, mas simple):</span>
-<span class="comment"># const map = L.map('map').setView([-33.449, -70.669], 12);</span>
+<span class="comment"># Ejemplo MapLibre GL (vector tiles):</span>
+<span class="comment"># const map = new maplibregl.Map({container:'map', style:'https://maps.drozast.xyz/styles/osm-bright/style.json', center:[-70.669,-33.449], zoom:12});</span>
+<span class="comment"># Ejemplo Leaflet (raster tiles):</span>
 <span class="comment"># L.tileLayer('https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png').addTo(map);</span>
-
-<span class="comment"># GEOCODING - Direccion a coordenadas:</span>
-<span class="comment"># const res = await fetch('https://geo.drozast.xyz/search?q=Av+Providencia+1234+Santiago&format=json&countrycodes=cl');</span>
-<span class="comment"># const data = await res.json();</span>
-<span class="comment"># // data[0] = { lat: "-33.xxx", lon: "-70.xxx", display_name: "..." }</span>
-
-<span class="comment"># GEOCODING REVERSO - Coordenadas a direccion:</span>
-<span class="comment"># const res = await fetch('https://geo.drozast.xyz/reverse?lat=-33.449&lon=-70.669&format=json');</span>
-
-<span class="comment"># RUTA entre 2 puntos:</span>
-<span class="comment"># const route = await fetch('https://routing.drozast.xyz/route/v1/driving/-70.669,-33.449;-70.600,-33.437?overview=full&geometries=geojson');</span>
-<span class="comment"># // route.routes[0] = { distance: metros, duration: segundos, geometry: GeoJSON }</span>
-
-<span class="comment"># EJEMPLO DART/FLUTTER (flutter_map + vector tiles):</span>
-<span class="comment"># // Geocoding</span>
-<span class="comment"># final res = await http.get(Uri.parse('https://geo.drozast.xyz/search?q=Santiago&format=json&countrycodes=cl'));</span>
-<span class="comment"># final data = json.decode(res.body);</span>
-<span class="comment"># // Mapa con flutter_map</span>
-<span class="comment"># FlutterMap(options: MapOptions(center: LatLng(-33.449, -70.669), zoom: 12),</span>
-<span class="comment">#   children: [TileLayer(urlTemplate: 'https://maps.drozast.xyz/styles/osm-bright/{z}/{x}/{y}.png')])</span>
+<span class="comment"># Ejemplo Geocoding:</span>
+<span class="comment"># fetch('https://geo.drozast.xyz/search?q=Providencia+Santiago&format=json&countrycodes=cl')</span>
+<span class="comment"># Ejemplo Ruta:</span>
+<span class="comment"># fetch('https://routing.drozast.xyz/route/v1/driving/-70.669,-33.449;-70.600,-33.437?geometries=geojson')</span>
 
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="section-label"># SISTEMA</span>
 <span class="section-label"># ─────────────────────────────────────────────────────────────────────────────────</span>
 <span class="key">OS</span>=<span class="value">"Ubuntu Server"</span>
-<span class="key">RAM</span>=<span class="value">"16GB"</span>
-<span class="key">CPU</span>=<span class="value">"4 cores"</span>
+<span class="key">RAM</span>=<span class="value">"30GB"</span>
+<span class="key">CPU</span>=<span class="value">"44 threads (22 cores)"</span>
 <span class="key">DOCKER</span>=<span class="value">"Docker + Docker Compose"</span>
 <span class="key">DEPLOY</span>=<span class="value">"Docker directo + Cloudflare Tunnel"</span>
 <span class="key">PROXY</span>=<span class="value">"Cloudflare Tunnel (sin NPM)"</span>
@@ -2383,11 +2857,28 @@
             document.getElementById('dashboard').classList.remove('active');
         }
 
+        let statsInterval = null;
+        let lastStats = null;
+
         function showDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.add('active');
+
+            // Mostrar datos en cache inmediatamente si existen
+            const cached = localStorage.getItem('drozast_stats_cache');
+            if (cached) {
+                try {
+                    lastStats = JSON.parse(cached);
+                    updateUI(lastStats);
+                } catch(e) {}
+            }
+
+            // Fetch fresh data
             fetchStats();
-            setInterval(fetchStats, 5000);
+
+            // Intervalo de 5 segundos
+            if (statsInterval) clearInterval(statsInterval);
+            statsInterval = setInterval(fetchStats, 5000);
         }
 
         // Tab switching
@@ -2421,92 +2912,410 @@
             });
         }
 
-        // Fetch stats
+        // Fetch stats con timeout y cache
         async function fetchStats() {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
+
             try {
-                const res = await fetch('https://stats.drozast.xyz/stats-api.php');
+                const res = await fetch('https://stats.drozast.xyz/stats-api.php', {
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
                 const data = await res.json();
 
-                // CPU
-                document.getElementById('cpuValue').textContent = data.cpu.usage + '%';
-                document.getElementById('cpuBar').style.width = data.cpu.usage + '%';
-                document.getElementById('cpuDetail').textContent = `${data.cpu.cores} cores • ${data.cpu.temp}°C • Load: ${data.cpu.load}`;
+                // Guardar en cache
+                lastStats = data;
+                localStorage.setItem('drozast_stats_cache', JSON.stringify(data));
 
-                // RAM
-                const ramUsedGB = (data.ram.used_mb / 1024).toFixed(1);
-                const ramTotalGB = (data.ram.total_mb / 1024).toFixed(1);
-                document.getElementById('ramValue').textContent = data.ram.percent + '%';
-                document.getElementById('ramBar').style.width = data.ram.percent + '%';
-                document.getElementById('ramDetail').textContent = `${ramUsedGB} / ${ramTotalGB} GB`;
+                updateUI(data);
+            } catch (e) {
+                // Si falla pero tenemos cache, no mostrar error
+                if (!lastStats) {
+                    document.getElementById('serverStatus').textContent = 'Error';
+                }
+            }
+        }
 
-                // Docker
-                document.getElementById('dockerValue').textContent = data.docker.running + '/' + data.docker.total;
-                document.getElementById('dockerDetail').textContent = `${data.docker.running} activos`;
+        function updateUI(data) {
+            // CPU
+            document.getElementById('cpuValue').textContent = data.cpu.usage + '%';
+            document.getElementById('cpuBar').style.width = data.cpu.usage + '%';
+            document.getElementById('cpuDetail').textContent = `${data.cpu.cores} cores • ${data.cpu.temp}°C • Load: ${data.cpu.load}`;
 
-                // Uptime
-                let uptime = '';
-                if (data.uptime.days > 0) uptime += data.uptime.days + 'd ';
-                uptime += data.uptime.hours + 'h ' + data.uptime.minutes + 'm';
-                document.getElementById('uptimeValue').textContent = uptime;
+            // RAM
+            const ramUsedGB = (data.ram.used_mb / 1024).toFixed(1);
+            const ramTotalGB = (data.ram.total_mb / 1024).toFixed(1);
+            document.getElementById('ramValue').textContent = data.ram.percent + '%';
+            document.getElementById('ramBar').style.width = data.ram.percent + '%';
+            document.getElementById('ramDetail').textContent = `${ramUsedGB} / ${ramTotalGB} GB`;
 
-                // Network
-                document.getElementById('netRx').textContent = data.network.rx_gb + ' GB';
-                document.getElementById('netTx').textContent = data.network.tx_gb + ' GB';
+            // Docker
+            document.getElementById('dockerValue').textContent = data.docker.running + '/' + data.docker.total;
+            document.getElementById('dockerDetail').textContent = `${data.docker.running} activos`;
 
-                // Energy - New structure with periods
-                document.getElementById('powerValue').textContent = data.energy.watts + ' W';
-                document.getElementById('powerDetail').textContent = 'Hoy: ' + data.energy.today.kwh + ' kWh';
-                document.getElementById('costValue').textContent = '$' + data.energy.month.cost_clp.toLocaleString();
-                document.getElementById('costDetail').textContent = data.energy.month.kwh + ' kWh este mes';
+            // Uptime
+            let uptime = '';
+            if (data.uptime.days > 0) uptime += data.uptime.days + 'd ';
+            uptime += data.uptime.hours + 'h ' + data.uptime.minutes + 'm';
+            document.getElementById('uptimeValue').textContent = uptime;
 
-                // Energy by periods
-                document.getElementById('energyToday').textContent = data.energy.today.kwh + ' kWh';
-                document.getElementById('costToday').textContent = '$' + data.energy.today.cost_clp.toLocaleString() + ' CLP';
-                document.getElementById('energyWeek').textContent = data.energy.week.kwh + ' kWh';
-                document.getElementById('costWeek').textContent = '$' + data.energy.week.cost_clp.toLocaleString() + ' CLP';
-                document.getElementById('energyMonth').textContent = data.energy.month.kwh + ' kWh';
-                document.getElementById('costMonth').textContent = '$' + data.energy.month.cost_clp.toLocaleString() + ' CLP';
-                document.getElementById('energyYear').textContent = data.energy.year.kwh + ' kWh';
-                document.getElementById('costYear').textContent = '$' + data.energy.year.cost_clp.toLocaleString() + ' CLP';
+            // Network
+            document.getElementById('netRx').textContent = data.network.rx_gb + ' GB';
+            document.getElementById('netTx').textContent = data.network.tx_gb + ' GB';
 
-                // Disk OS
-                document.getElementById('osUsed').textContent = data.disk.root.used;
-                document.getElementById('osFree').textContent = data.disk.root.free;
-                const osBar = document.getElementById('osBar');
-                osBar.style.width = data.disk.root.percent + '%';
-                osBar.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
+            // Energy - New structure with periods
+            document.getElementById('powerValue').textContent = data.energy.watts + ' W';
+            document.getElementById('powerDetail').textContent = 'Hoy: ' + data.energy.today.kwh + ' kWh';
+            document.getElementById('costValue').textContent = '$' + data.energy.month.cost_clp.toLocaleString();
+            document.getElementById('costDetail').textContent = data.energy.month.kwh + ' kWh este mes';
 
-                // Disk OS (storage tab)
-                document.getElementById('osUsed2').textContent = data.disk.root.used;
-                document.getElementById('osFree2').textContent = data.disk.root.free;
-                document.getElementById('osPercent2').textContent = data.disk.root.percent + '%';
-                const osBar2 = document.getElementById('osBar2');
-                osBar2.style.width = data.disk.root.percent + '%';
-                osBar2.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
+            // Energy by periods
+            document.getElementById('energyToday').textContent = data.energy.today.kwh + ' kWh';
+            document.getElementById('costToday').textContent = '$' + data.energy.today.cost_clp.toLocaleString() + ' CLP';
+            document.getElementById('energyWeek').textContent = data.energy.week.kwh + ' kWh';
+            document.getElementById('costWeek').textContent = '$' + data.energy.week.cost_clp.toLocaleString() + ' CLP';
+            document.getElementById('energyMonth').textContent = data.energy.month.kwh + ' kWh';
+            document.getElementById('costMonth').textContent = '$' + data.energy.month.cost_clp.toLocaleString() + ' CLP';
+            document.getElementById('energyYear').textContent = data.energy.year.kwh + ' kWh';
+            document.getElementById('costYear').textContent = '$' + data.energy.year.cost_clp.toLocaleString() + ' CLP';
 
-                // Disk I/O
-                document.getElementById('diskRead').textContent = data.disk.io.read_gb.toFixed(1) + ' GB';
-                document.getElementById('diskWrite').textContent = data.disk.io.write_gb.toFixed(1) + ' GB';
+            // Disk OS
+            document.getElementById('osUsed').textContent = data.disk.root.used;
+            document.getElementById('osFree').textContent = data.disk.root.free;
+            const osBar = document.getElementById('osBar');
+            osBar.style.width = data.disk.root.percent + '%';
+            osBar.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
 
-                // Time
-                document.getElementById('serverTime').textContent = data.timestamp;
+            // Disk OS (storage tab)
+            document.getElementById('osUsed2').textContent = data.disk.root.used;
+            document.getElementById('osFree2').textContent = data.disk.root.free;
+            document.getElementById('osPercent2').textContent = data.disk.root.percent + '%';
+            const osBar2 = document.getElementById('osBar2');
+            osBar2.style.width = data.disk.root.percent + '%';
+            osBar2.className = 'disk-progress-fill ' + getProgressClass(data.disk.root.percent);
 
-                // Fetch RAID data separately (needs custom endpoint or estimation)
-                updateRaidStats();
+            // Disk I/O
+            document.getElementById('diskRead').textContent = data.disk.io.read_gb.toFixed(1) + ' GB';
+            document.getElementById('diskWrite').textContent = data.disk.io.write_gb.toFixed(1) + ' GB';
 
-                // Update container stats (CPU/RAM bars)
-                if (data.container_stats) {
-                    updateContainerStats(data.container_stats);
+            // Time
+            document.getElementById('serverTime').textContent = data.timestamp;
+
+            // Fetch RAID data separately (needs custom endpoint or estimation)
+            updateRaidStats();
+
+            // Update container stats (CPU/RAM bars)
+            if (data.container_stats) {
+                updateContainerStats(data.container_stats);
+            }
+
+            // Update hardware monitor
+            updateHardwareStats(data);
+
+            // Update energy details
+            updateEnergyDetails(data);
+        }
+
+        function updateHardwareStats(data) {
+            // CPU Details
+            if (data.cpu) {
+                // CPU Model
+                if (data.cpu.model) {
+                    document.getElementById('cpuModel').textContent = data.cpu.model.trim();
                 }
 
-            } catch (e) {
-                document.getElementById('serverStatus').textContent = 'Error';
+                // Total usage
+                document.getElementById('cpuTotalUsage').textContent = data.cpu.usage + '%';
+                document.getElementById('cpuAvgTemp').textContent = data.cpu.temp + '°C';
+
+                // Calculate average frequency
+                if (data.cpu.per_core && Object.keys(data.cpu.per_core).length > 0) {
+                    let totalFreq = 0;
+                    let coreCount = 0;
+                    const coresGrid = document.getElementById('coresGrid');
+                    let coresHtml = '';
+
+                    Object.keys(data.cpu.per_core).sort((a, b) => parseInt(a) - parseInt(b)).forEach(coreNum => {
+                        const core = data.cpu.per_core[coreNum];
+                        const usage = core.usage || 0;
+                        const freq = core.freq_mhz || 0;
+                        totalFreq += freq;
+                        coreCount++;
+
+                        const usageColor = usage > 80 ? 'var(--danger)' : usage > 50 ? 'var(--warning)' : 'var(--success)';
+                        coresHtml += `
+                            <div class="core-item" style="border-bottom: 3px solid ${usageColor}">
+                                <div class="core-num">Core ${coreNum}</div>
+                                <div class="core-usage">${usage}%</div>
+                                <div class="core-freq">${freq} MHz</div>
+                            </div>
+                        `;
+                    });
+
+                    coresGrid.innerHTML = coresHtml;
+
+                    if (coreCount > 0) {
+                        const avgFreq = Math.round(totalFreq / coreCount);
+                        document.getElementById('cpuAvgFreq').textContent = avgFreq + ' MHz';
+                    }
+                }
+
+                // CPU Temperatures
+                if (data.cpu.temps && data.cpu.temps.length > 0) {
+                    const tempPills = document.getElementById('cpuTempPills');
+                    let tempHtml = '';
+                    data.cpu.temps.forEach(t => {
+                        const tempClass = t.temp > 80 ? 'hot' : t.temp > 60 ? 'warm' : '';
+                        tempHtml += `
+                            <div class="temp-pill">
+                                <span class="temp-pill-label">${t.label}</span>
+                                <span class="temp-pill-value ${tempClass}">${t.temp}°C</span>
+                            </div>
+                        `;
+                    });
+                    tempPills.innerHTML = tempHtml;
+                }
+            }
+
+            // GPU Details
+            if (data.gpu) {
+                document.getElementById('gpuModel').textContent = data.gpu.name;
+                document.getElementById('gpuUsage').textContent = data.gpu.usage + '%';
+                document.getElementById('gpuTemp').textContent = data.gpu.temp + '°C';
+                document.getElementById('gpuPower').textContent = data.gpu.power_w + ' W';
+
+                // GPU Bars
+                document.getElementById('gpuUsageBar').style.width = data.gpu.usage + '%';
+                document.getElementById('gpuUsageVal').textContent = data.gpu.usage + '%';
+
+                const memPercent = Math.round((data.gpu.mem_used_mb / data.gpu.mem_total_mb) * 100);
+                document.getElementById('gpuMemBar').style.width = memPercent + '%';
+                document.getElementById('gpuMemVal').textContent =
+                    (data.gpu.mem_used_mb / 1024).toFixed(1) + ' / ' + (data.gpu.mem_total_mb / 1024).toFixed(1) + ' GB';
+
+                const tempPercent = Math.min((data.gpu.temp / 100) * 100, 100);
+                document.getElementById('gpuTempBar').style.width = tempPercent + '%';
+                document.getElementById('gpuTempVal').textContent = data.gpu.temp + '°C';
+
+                // GPU Details pills
+                document.getElementById('gpuClock').textContent = data.gpu.clock_mhz + ' MHz';
+                document.getElementById('gpuMemClock').textContent = data.gpu.mem_clock_mhz + ' MHz';
+                document.getElementById('gpuFan').textContent = data.gpu.fan_percent + '%';
+            } else {
+                document.getElementById('gpuModel').textContent = 'No GPU detectada';
+                document.getElementById('gpuCard').style.opacity = '0.5';
+            }
+
+            // Motherboard Details
+            if (data.motherboard) {
+                const mbInfo = data.motherboard.vendor + ' ' + data.motherboard.name;
+                document.getElementById('mbModel').textContent = mbInfo !== ' ' ? mbInfo : 'Desconocida';
+
+                // Parse sensors if available
+                if (data.motherboard.sensors && Object.keys(data.motherboard.sensors).length > 0) {
+                    const mbSensors = document.getElementById('mbSensors');
+                    let sensorsHtml = '';
+
+                    Object.keys(data.motherboard.sensors).forEach(adapter => {
+                        const adapterData = data.motherboard.sensors[adapter];
+                        Object.keys(adapterData).forEach(sensor => {
+                            if (sensor === 'Adapter') return;
+                            const sensorData = adapterData[sensor];
+                            Object.keys(sensorData).forEach(reading => {
+                                const value = sensorData[reading];
+                                if (typeof value === 'number') {
+                                    let unit = '';
+                                    let tempClass = '';
+                                    if (reading.includes('temp') || reading.includes('Temp')) {
+                                        unit = '°C';
+                                        tempClass = value > 80 ? 'hot' : value > 60 ? 'warm' : '';
+                                    } else if (reading.includes('fan') || reading.includes('Fan')) {
+                                        unit = ' RPM';
+                                    } else if (reading.includes('in') || reading.includes('vol')) {
+                                        unit = ' V';
+                                    } else if (reading.includes('power')) {
+                                        unit = ' W';
+                                    }
+                                    sensorsHtml += `
+                                        <div class="temp-pill">
+                                            <span class="temp-pill-label">${sensor}</span>
+                                            <span class="temp-pill-value ${tempClass}">${value.toFixed(1)}${unit}</span>
+                                        </div>
+                                    `;
+                                }
+                            });
+                        });
+                    });
+
+                    if (sensorsHtml) {
+                        mbSensors.innerHTML = sensorsHtml;
+                    } else {
+                        mbSensors.innerHTML = '<div class="temp-pill"><span class="temp-pill-label">Sin sensores disponibles</span></div>';
+                    }
+                } else {
+                    document.getElementById('mbSensors').innerHTML = '<div class="temp-pill"><span class="temp-pill-label">Sensores no disponibles (instalar lm-sensors)</span></div>';
+                }
+            }
+        }
+
+        function updateEnergyDetails(data) {
+            if (!data.energy) return;
+
+            const energy = data.energy;
+
+            // Desglose de consumo actual
+            if (energy.breakdown) {
+                const total = energy.breakdown.total || 1;
+                document.getElementById('totalWattsLabel').textContent = total + ' W Total';
+
+                // CPU watts
+                const cpuW = energy.breakdown.cpu || 0;
+                document.getElementById('cpuWattsVal').textContent = cpuW + ' W';
+                document.getElementById('cpuWattsBar').style.width = (cpuW / total * 100) + '%';
+
+                // GPU watts
+                const gpuW = energy.breakdown.gpu || 0;
+                document.getElementById('gpuWattsVal').textContent = gpuW + ' W';
+                document.getElementById('gpuWattsBar').style.width = (gpuW / total * 100) + '%';
+
+                // Motherboard + RAM
+                const mbW = (energy.breakdown.motherboard || 0) + (energy.breakdown.ram || 0);
+                document.getElementById('mbWattsVal').textContent = mbW.toFixed(1) + ' W';
+                document.getElementById('mbWattsBar').style.width = (mbW / total * 100) + '%';
+
+                // Storage + Fans
+                const storageW = (energy.breakdown.storage || 0) + (energy.breakdown.fans || 0);
+                document.getElementById('storageWattsVal').textContent = storageW + ' W';
+                document.getElementById('storageWattsBar').style.width = (storageW / total * 100) + '%';
+            }
+
+            // Promedio 24h
+            if (energy.avg_watts_24h) {
+                document.getElementById('avgWatts24h').textContent = energy.avg_watts_24h + ' W';
+            }
+
+            // Estimación mensual
+            if (energy.estimated_monthly) {
+                document.getElementById('estimatedMonthly').textContent = energy.estimated_monthly.kwh + ' kWh';
+                document.getElementById('estimatedMonthlyCost').textContent = '$' + energy.estimated_monthly.cost_clp.toLocaleString();
+            }
+
+            // Tarifa
+            if (energy.cost_per_kwh) {
+                document.getElementById('costPerKwh').textContent = '$' + energy.cost_per_kwh + ' /kWh';
+            }
+
+            // Historial diario (últimos 7 días)
+            if (energy.daily_history) {
+                const chartEl = document.getElementById('dailyHistoryChart');
+                const days = Object.keys(energy.daily_history);
+                const values = Object.values(energy.daily_history);
+                const maxVal = Math.max(...values, 0.1);
+
+                let html = '';
+                days.forEach((day, i) => {
+                    const val = values[i];
+                    const height = (val / maxVal) * 100;
+                    const dayName = new Date(day).toLocaleDateString('es', { weekday: 'short' });
+                    const cost = Math.round(val * (energy.cost_per_kwh || 295));
+
+                    html += `
+                        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <div style="font-size: 10px; color: var(--text-primary);">${val.toFixed(2)}</div>
+                            <div style="width: 100%; height: ${height}%; min-height: 4px; background: linear-gradient(180deg, var(--accent), var(--info)); border-radius: 4px 4px 0 0;"></div>
+                            <div style="font-size: 10px; color: var(--text-muted);">${dayName}</div>
+                            <div style="font-size: 9px; color: var(--warning);">$${cost}</div>
+                        </div>
+                    `;
+                });
+                chartEl.innerHTML = html;
+            }
+
+            // Patrón por hora del día
+            if (energy.hourly_pattern) {
+                const chartEl = document.getElementById('hourlyPatternChart');
+                const values = Object.values(energy.hourly_pattern);
+                const maxVal = Math.max(...values, 1);
+
+                let html = '';
+                for (let h = 0; h < 24; h++) {
+                    const val = values[h] || 0;
+                    const height = (val / maxVal) * 100;
+                    const color = val > maxVal * 0.7 ? 'var(--danger)' : val > maxVal * 0.4 ? 'var(--warning)' : 'var(--success)';
+
+                    html += `
+                        <div style="flex: 1; height: ${height}%; min-height: 2px; background: ${color}; border-radius: 2px 2px 0 0;" title="${h}:00 - ${val}W"></div>
+                    `;
+                }
+                chartEl.innerHTML = html;
             }
         }
 
         function updateContainerStats(stats) {
+            // Wolf child containers (WolfSteam_*, Wolf-UI_*, WolfPulseAudio)
+            let wolfSessions = [];
+            let wolfTotalCpu = 0;
+            let wolfTotalRam = 0;
+
+            Object.keys(stats).forEach(name => {
+                if ((name.startsWith('Wolf') || name.startsWith('wolf')) && name !== 'wolf-gaming') {
+                    const s = stats[name];
+                    wolfTotalCpu += s.cpu_percent;
+                    wolfTotalRam += s.mem_usage_mb;
+                    // Friendly name
+                    let label = name;
+                    if (name.startsWith('WolfSteam')) label = 'Steam';
+                    else if (name.startsWith('Wolf-UI')) label = 'Wolf UI';
+                    else if (name === 'WolfPulseAudio') label = 'Audio';
+                    wolfSessions.push({ name: label, ram: s.mem_usage_mb, cpu: s.cpu_percent });
+                }
+            });
+
+            // Update wolf sessions panel
+            const listEl = document.getElementById('wolfSessionsList');
+            const stopBtn = document.getElementById('wolfStopBtn');
+
+            if (wolfSessions.length > 0) {
+                let html = '';
+                wolfSessions.forEach(s => {
+                    html += `<div class="wolf-session-item">
+                        <span class="session-name">${s.name}</span>
+                        <span class="session-ram">${s.ram >= 1024 ? (s.ram/1024).toFixed(1)+'GB' : s.ram.toFixed(0)+'MB'}</span>
+                    </div>`;
+                });
+                html += `<div class="wolf-session-item" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px">
+                    <span class="session-name">Total sesiones</span>
+                    <span class="session-ram" style="color:var(--danger)">${wolfTotalRam >= 1024 ? (wolfTotalRam/1024).toFixed(1)+'GB' : wolfTotalRam.toFixed(0)+'MB'}</span>
+                </div>`;
+                listEl.innerHTML = html;
+                listEl.className = '';
+                stopBtn.style.display = '';
+            } else {
+                listEl.innerHTML = 'Sin sesiones activas';
+                listEl.className = 'wolf-no-sessions';
+                stopBtn.style.display = 'none';
+            }
+
+            // Add wolf child stats to wolf-gaming card totals
+            const wolfCard = document.getElementById('wolfCard');
+            if (wolfCard && stats['wolf-gaming']) {
+                const totalCpu = stats['wolf-gaming'].cpu_percent + wolfTotalCpu;
+                const totalRam = stats['wolf-gaming'].mem_usage_mb + wolfTotalRam;
+                const cpuVal = wolfCard.querySelector('.cpu-val');
+                const ramVal = wolfCard.querySelector('.ram-val');
+                const cpuBar = wolfCard.querySelector('.service-stat-fill.cpu');
+                const ramBar = wolfCard.querySelector('.service-stat-fill.ram');
+                if (cpuVal) cpuVal.textContent = totalCpu.toFixed(1) + '%';
+                if (ramVal) ramVal.textContent = totalRam >= 1024 ? (totalRam/1024).toFixed(1)+'GB' : totalRam.toFixed(0)+'MB';
+                if (cpuBar) cpuBar.style.width = Math.min(totalCpu, 100) + '%';
+                if (ramBar) ramBar.style.width = Math.min(totalRam / 300, 100) + '%'; // 30GB scale
+            }
+
+            // Update all other service cards
             document.querySelectorAll('.service-card[data-container]').forEach(card => {
                 const containerName = card.dataset.container;
+                if (containerName === 'wolf-gaming') return; // handled above
                 const containerData = stats[containerName];
 
                 if (containerData) {
@@ -2521,13 +3330,11 @@
                     if (cpuBar) cpuBar.style.width = Math.min(containerData.cpu_percent, 100) + '%';
                     if (ramBar) ramBar.style.width = Math.min(containerData.mem_percent, 100) + '%';
 
-                    // Update status badge
                     if (statusBadge) {
                         statusBadge.className = 'service-status online';
                         statusBadge.innerHTML = '<span class="status-dot"></span>Online';
                     }
                 } else {
-                    // Container not running
                     const statusBadge = card.querySelector('.service-status');
                     if (statusBadge) {
                         statusBadge.className = 'service-status offline';
@@ -2535,6 +3342,21 @@
                     }
                 }
             });
+        }
+
+        async function stopWolfSessions() {
+            if (!confirm('Detener todas las sesiones de Wolf Gaming? Esto cerrara Steam, UI y audio.')) return;
+            const btn = document.getElementById('wolfStopBtn');
+            btn.textContent = 'Deteniendo...';
+            try {
+                const res = await fetch('https://stats.drozast.xyz/wolf-action.php?action=stop');
+                const data = await res.json();
+                btn.textContent = data.stopped + ' detenidos';
+                setTimeout(() => { btn.textContent = 'Detener sesiones'; fetchStats(); }, 2000);
+            } catch(e) {
+                btn.textContent = 'Error';
+                setTimeout(() => { btn.textContent = 'Detener sesiones'; }, 2000);
+            }
         }
 
         function updateRaidStats() {
