@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Drozast Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --border: #2a2a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b9a;
+            --text-muted: #5a5a6a;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 65px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            border-right: 2px solid var(--accent);
+        }
+
+        .nav-icon { font-size: 18px; }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--text-secondary);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            background-color: white;
+            transform: translateX(24px);
+        }
+
+        /* Inline Input */
+        .inline-input {
+            padding: 4px 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 13px;
+            width: auto;
+            min-width: 60px;
+        }
+
+        .inline-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Card Description */
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: -8px 0 16px 0;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            font-size: 14px;
+        }
+
+        .table tr:hover td {
+            background: var(--bg-card-hover);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        /* Badge */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success { background: var(--success); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--info); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Icon button */
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* Section hidden */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="index.html" class="back-btn">← Dashboard</a>
+            <span class="logo">Admin Panel</span>
+        </div>
+        <div class="user-info">
+            <span id="userEmail">-</span>
+            <button class="btn btn-secondary btn-sm" onclick="logout()">Salir</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <a class="nav-item active" onclick="showSection('containers')">
+                <span class="nav-icon">📦</span>
+                Contenedores
+            </a>
+            <a class="nav-item" onclick="showSection('discover')">
+                <span class="nav-icon">🔍</span>
+                Descubrir
+            </a>
+            <a class="nav-item" onclick="showSection('categories')">
+                <span class="nav-icon">📁</span>
+                Categorías
+            </a>
+            <a class="nav-item" onclick="showSection('apikeys')">
+                <span class="nav-icon">🔑</span>
+                API Keys
+            </a>
+            <a class="nav-item" onclick="showSection('alerts')">
+                <span class="nav-icon">🔔</span>
+                Alertas NTFY
+            </a>
+            <a class="nav-item" onclick="showSection('audit')">
+                <span class="nav-icon">📋</span>
+                Audit Log
+            </a>
+        </aside>
+
+        <main class="main">
+            <!-- Containers Section -->
+            <section id="section-containers" class="section active">
+                <h1 class="page-title">Contenedores</h1>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalContainers">0</div>
+                        <div class="stat-label">Total en DB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="runningContainers">0</div>
+                        <div class="stat-label">Corriendo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="categoriesCount">0</div>
+                        <div class="stat-label">Categorías</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Contenedores Registrados</span>
+                        <button class="btn btn-primary" onclick="openContainerModal()">+ Agregar</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Icono</th>
+                                <th>Nombre</th>
+                                <th>Container</th>
+                                <th>Categoría</th>
+                                <th>URL</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="containersTable">
+                            <tr><td colspan="6" class="empty-state">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Discover Section -->
+            <section id="section-discover" class="section">
+                <h1 class="page-title">Descubrir Contenedores</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Contenedores no registrados</span>
+                        <button class="btn btn-primary" onclick="discoverContainers()">🔍 Buscar</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Container Name</th>
+                                <th>Imagen</th>
+                                <th>Estado</th>
+                                <th>Puerto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="discoverTable">
+                            <tr><td colspan="5" class="empty-state">Click en "Buscar" para descubrir contenedores</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section id="section-categories" class="section">
+                <h1 class="page-title">Categorías</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Gestionar Categorías</span>
+                        <button class="btn btn-primary" onclick="openCategoryModal()">+ Nueva</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Icono</th>
+                                <th>Nombre</th>
+                                <th>Contenedores</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTable">
+                            <tr><td colspan="4" class="empty-state">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- API Keys Section -->
+            <section id="section-apikeys" class="section">
+                <h1 class="page-title">API Keys</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Claves de API</span>
+                        <button class="btn btn-primary" onclick="openApiKeyModal()">+ Crear</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Creada</th>
+                                <th>Último Uso</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apikeysTable">
+                            <tr><td colspan="5" class="empty-state">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section id="section-alerts" class="section">
+                <h1 class="page-title">Alertas NTFY</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Configuracion de Alertas</span>
+                        <button class="btn btn-secondary" onclick="loadAlerts()">Refrescar</button>
+                    </div>
+                    <p class="card-description">Configura umbrales para recibir notificaciones push via NTFY cuando se excedan.</p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Metrica</th>
+                                <th>Umbral</th>
+                                <th>Contenedor</th>
+                                <th>Topic NTFY</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTable">
+                            <tr><td colspan="6" class="empty-state">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Probar Notificacion</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Topic NTFY</label>
+                            <input type="text" id="testNtfyTopic" value="drozast-alerts" placeholder="Ej: drozast-alerts">
+                        </div>
+                        <div class="form-group">
+                            <label>Mensaje</label>
+                            <input type="text" id="testNtfyMessage" value="Prueba de notificacion desde Dashboard" placeholder="Mensaje de prueba">
+                        </div>
+                        <button class="btn btn-primary" onclick="testNtfyNotification()">Enviar Prueba</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audit Log Section -->
+            <section id="section-audit" class="section">
+                <h1 class="page-title">Audit Log</h1>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Historial de Acciones</span>
+                        <button class="btn btn-secondary" onclick="loadAuditLog()">Refrescar</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Container</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTable">
+                            <tr><td colspan="5" class="empty-state">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Container Modal -->
+    <div id="containerModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('containerModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="containerModalTitle">Agregar Contenedor</span>
+                <button class="modal-close" onclick="closeModal('containerModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="containerForm">
+                    <input type="hidden" id="containerId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Container Name *</label>
+                            <input type="text" class="form-control" id="containerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Display Name *</label>
+                            <input type="text" class="form-control" id="displayName" required>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Icono</label>
+                            <input type="text" class="form-control" id="containerIcon" placeholder="📦">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select class="form-control" id="containerCategory">
+                                <option value="">Sin categoría</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" id="containerDescription">
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Subdominio</label>
+                            <input type="text" class="form-control" id="containerSubdomain" placeholder="app.drozast.xyz">
+                        </div>
+                        <div class="form-group">
+                            <label>Puerto Local</label>
+                            <input type="number" class="form-control" id="containerPort">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>URL Externa</label>
+                        <input type="url" class="form-control" id="containerUrl" placeholder="https://app.drozast.xyz">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('containerModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveContainer()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('categoryModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Nueva Categoría</span>
+                <button class="modal-close" onclick="closeModal('categoryModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Nombre *</label>
+                            <input type="text" class="form-control" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Icono</label>
+                            <input type="text" class="form-control" id="categoryIcon" placeholder="📁">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('categoryModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveCategory()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div id="apikeyModal" class="modal">
+        <div class="modal-backdrop" onclick="closeModal('apikeyModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Crear API Key</span>
+                <button class="modal-close" onclick="closeModal('apikeyModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre de la Key *</label>
+                    <input type="text" class="form-control" id="apikeyName" placeholder="Ej: Claude Integration">
+                </div>
+                <div id="newKeyDisplay" style="display:none; margin-top: 16px;">
+                    <div class="form-group">
+                        <label>Tu nueva API Key (cópiala ahora, no se mostrará de nuevo)</label>
+                        <input type="text" class="form-control" id="newKeyValue" readonly style="font-family: monospace;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="copyApiKey()">📋 Copiar</button>
+                </div>
+            </div>
+            <div class="modal-footer" id="apikeyModalFooter">
+                <button class="btn btn-secondary" onclick="closeModal('apikeyModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createApiKey()">Crear</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="public/js/config.js"></script>
+    <script src="public/js/auth.js"></script>
+    <script src="public/js/api.js"></script>
+    <script>
+        let categories = [];
+
+        // Check auth on load
+        async function init() {
+            const authenticated = await Auth.init();
+            if (!authenticated) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userEmail').textContent = Auth.getUser()?.email || '';
+
+            loadCategories();
+            loadContainers();
+            loadApiKeys();
+            loadAuditLog();
+        }
+
+        function logout() {
+            Auth.logout();
+            window.location.href = 'index.html';
+        }
+
+        // Navigation
+        function showSection(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            document.getElementById('section-' + name).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+
+            // Load section data
+            if (name === 'alerts') loadAlerts();
+            if (name === 'audit') loadAuditLog();
+        }
+
+        // Modal helpers
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        // Toast
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============ CONTAINERS ============
+
+        async function loadContainers() {
+            try {
+                const data = await API.getContainers();
+                const containers = data.containers || [];
+
+                document.getElementById('totalContainers').textContent = containers.length;
+                document.getElementById('runningContainers').textContent =
+                    containers.filter(c => c.status === 'running').length;
+
+                const tbody = document.getElementById('containersTable');
+                if (containers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay contenedores</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = containers.map(c => `
+                    <tr>
+                        <td>${c.icon || '📦'}</td>
+                        <td><strong>${c.display_name}</strong></td>
+                        <td><code>${c.container_name}</code></td>
+                        <td>${c.category?.name || '-'}</td>
+                        <td>${c.external_url ? `<a href="${c.external_url}" target="_blank">${c.subdomain || 'Link'}</a>` : '-'}</td>
+                        <td class="actions">
+                            <button class="icon-btn" onclick="editContainer(${c.id})" title="Editar">✏️</button>
+                            <button class="icon-btn" onclick="deleteContainer(${c.id})" title="Eliminar">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Error cargando contenedores', 'error');
+            }
+        }
+
+        function openContainerModal(container = null) {
+            document.getElementById('containerForm').reset();
+            document.getElementById('containerId').value = '';
+            document.getElementById('containerModalTitle').textContent = 'Agregar Contenedor';
+
+            // Populate categories dropdown
+            const select = document.getElementById('containerCategory');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+
+            if (container) {
+                document.getElementById('containerModalTitle').textContent = 'Editar Contenedor';
+                document.getElementById('containerId').value = container.id;
+                document.getElementById('containerName').value = container.container_name;
+                document.getElementById('displayName').value = container.display_name;
+                document.getElementById('containerIcon').value = container.icon || '';
+                document.getElementById('containerCategory').value = container.category_id || '';
+                document.getElementById('containerDescription').value = container.description || '';
+                document.getElementById('containerSubdomain').value = container.subdomain || '';
+                document.getElementById('containerPort').value = container.local_port || '';
+                document.getElementById('containerUrl').value = container.external_url || '';
+            }
+
+            openModal('containerModal');
+        }
+
+        async function editContainer(id) {
+            try {
+                const data = await API.getContainer(id);
+                openContainerModal(data.container);
+            } catch (e) {
+                // Try to find in loaded list
+                const data = await API.getContainers();
+                const container = data.containers.find(c => c.id === id);
+                if (container) openContainerModal(container);
+            }
+        }
+
+        async function saveContainer() {
+            const id = document.getElementById('containerId').value;
+            const data = {
+                container_name: document.getElementById('containerName').value,
+                display_name: document.getElementById('displayName').value,
+                icon: document.getElementById('containerIcon').value || '📦',
+                category_id: document.getElementById('containerCategory').value || null,
+                description: document.getElementById('containerDescription').value,
+                subdomain: document.getElementById('containerSubdomain').value,
+                local_port: document.getElementById('containerPort').value || null,
+                external_url: document.getElementById('containerUrl').value,
+            };
+
+            try {
+                if (id) {
+                    await API.updateContainer(id, data);
+                    showToast('Contenedor actualizado', 'success');
+                } else {
+                    await API.createContainer(data);
+                    showToast('Contenedor creado', 'success');
+                }
+                closeModal('containerModal');
+                loadContainers();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function deleteContainer(id) {
+            if (!confirm('¿Eliminar este contenedor de la base de datos?')) return;
+
+            try {
+                await API.deleteContainer(id);
+                showToast('Contenedor eliminado', 'success');
+                loadContainers();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        // ============ DISCOVER ============
+
+        async function discoverContainers() {
+            const tbody = document.getElementById('discoverTable');
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Buscando...</td></tr>';
+
+            try {
+                const data = await API.discoverContainers();
+                const discovered = data.discovered || [];
+
+                if (discovered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay contenedores nuevos</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = discovered.map(c => `
+                    <tr>
+                        <td><code>${c.container_name}</code></td>
+                        <td>${c.image || '-'}</td>
+                        <td><span class="badge badge-${c.status === 'running' ? 'success' : 'danger'}">${c.status}</span></td>
+                        <td>${c.local_port || '-'}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="quickAddContainer('${c.container_name}', '${c.suggested_display_name}', ${c.local_port || 'null'})">
+                                + Agregar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Error al buscar</td></tr>';
+            }
+        }
+
+        function quickAddContainer(name, displayName, port) {
+            document.getElementById('containerForm').reset();
+            document.getElementById('containerId').value = '';
+            document.getElementById('containerName').value = name;
+            document.getElementById('displayName').value = displayName;
+            document.getElementById('containerPort').value = port || '';
+
+            const select = document.getElementById('containerCategory');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('');
+
+            document.getElementById('containerModalTitle').textContent = 'Agregar: ' + name;
+            openModal('containerModal');
+        }
+
+        // ============ CATEGORIES ============
+
+        async function loadCategories() {
+            try {
+                const data = await API.getCategories();
+                categories = data.categories || [];
+
+                document.getElementById('categoriesCount').textContent = categories.length;
+
+                const tbody = document.getElementById('categoriesTable');
+                if (categories.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No hay categorías</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = categories.map(c => `
+                    <tr>
+                        <td>${c.icon || '📁'}</td>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.container_count || 0}</td>
+                        <td class="actions">
+                            <button class="icon-btn" onclick="editCategory(${c.id}, '${c.name}', '${c.icon || '📁'}')" title="Editar">✏️</button>
+                            <button class="icon-btn" onclick="deleteCategory(${c.id})" title="Eliminar">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Error cargando categorías', 'error');
+            }
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            openModal('categoryModal');
+        }
+
+        function editCategory(id, name, icon) {
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryName').value = name;
+            document.getElementById('categoryIcon').value = icon;
+            openModal('categoryModal');
+        }
+
+        async function saveCategory() {
+            const id = document.getElementById('categoryId').value;
+            const data = {
+                name: document.getElementById('categoryName').value,
+                icon: document.getElementById('categoryIcon').value || '📁',
+            };
+
+            try {
+                if (id) {
+                    await API.updateCategory(id, data);
+                    showToast('Categoría actualizada', 'success');
+                } else {
+                    await API.createCategory(data);
+                    showToast('Categoría creada', 'success');
+                }
+                closeModal('categoryModal');
+                loadCategories();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('¿Eliminar esta categoría? Los contenedores quedarán sin categoría.')) return;
+
+            try {
+                await API.deleteCategory(id);
+                showToast('Categoría eliminada', 'success');
+                loadCategories();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        // ============ API KEYS ============
+
+        async function loadApiKeys() {
+            try {
+                const data = await API.getApiKeys();
+                const keys = data.api_keys || [];
+
+                const tbody = document.getElementById('apikeysTable');
+                if (keys.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay API keys</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = keys.map(k => `
+                    <tr>
+                        <td><strong>${k.name}</strong></td>
+                        <td>${k.created_at}</td>
+                        <td>${k.last_used || 'Nunca'}</td>
+                        <td><span class="badge badge-${k.is_active ? 'success' : 'danger'}">${k.is_active ? 'Activa' : 'Revocada'}</span></td>
+                        <td class="actions">
+                            <button class="icon-btn" onclick="deleteApiKey(${k.id})" title="Eliminar">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Error cargando API keys', 'error');
+            }
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('apikeyName').value = '';
+            document.getElementById('newKeyDisplay').style.display = 'none';
+            document.getElementById('apikeyModalFooter').style.display = 'flex';
+            openModal('apikeyModal');
+        }
+
+        async function createApiKey() {
+            const name = document.getElementById('apikeyName').value;
+            if (!name) {
+                showToast('Ingresa un nombre', 'error');
+                return;
+            }
+
+            try {
+                const data = await API.createApiKey(name);
+                document.getElementById('newKeyValue').value = data.api_key.key;
+                document.getElementById('newKeyDisplay').style.display = 'block';
+                document.getElementById('apikeyModalFooter').style.display = 'none';
+                loadApiKeys();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        function copyApiKey() {
+            const input = document.getElementById('newKeyValue');
+            input.select();
+            document.execCommand('copy');
+            showToast('API Key copiada', 'success');
+        }
+
+        async function deleteApiKey(id) {
+            if (!confirm('¿Eliminar esta API key?')) return;
+
+            try {
+                await API.deleteApiKey(id);
+                showToast('API key eliminada', 'success');
+                loadApiKeys();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        }
+
+        // ============ ALERTS ============
+
+        async function loadAlerts() {
+            try {
+                const data = await API.getAlerts();
+                const alerts = data.alerts || [];
+
+                const tbody = document.getElementById('alertsTable');
+                if (alerts.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay alertas configuradas</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = alerts.map(alert => `
+                    <tr data-id="${alert.id}">
+                        <td><strong>${alert.metric.toUpperCase()}</strong></td>
+                        <td>
+                            <input type="number" class="inline-input" value="${alert.threshold}"
+                                   onchange="updateAlert(${alert.id}, 'threshold', this.value)" min="0" max="100">%
+                        </td>
+                        <td>${alert.container_name || '<span style="color:var(--text-muted)">Sistema</span>'}</td>
+                        <td>
+                            <input type="text" class="inline-input" value="${alert.ntfy_topic}"
+                                   onchange="updateAlert(${alert.id}, 'ntfy_topic', this.value)">
+                        </td>
+                        <td>
+                            <label class="toggle">
+                                <input type="checkbox" ${alert.is_active ? 'checked' : ''}
+                                       onchange="updateAlert(${alert.id}, 'is_active', this.checked ? 1 : 0)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </td>
+                        <td class="actions">
+                            <button class="btn btn-sm" onclick="testAlertTopic('${alert.ntfy_topic}')">🔔 Probar</button>
+                            ${alert.last_triggered ? `<small style="color:var(--text-muted);display:block;margin-top:4px;">Última: ${new Date(alert.last_triggered).toLocaleString('es-CL')}</small>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Error cargando alertas: ' + e.message, 'error');
+            }
+        }
+
+        async function updateAlert(id, field, value) {
+            try {
+                const data = {};
+                data[field] = value;
+                await API.updateAlert(id, data);
+                showToast('Alerta actualizada', 'success');
+            } catch (e) {
+                showToast('Error actualizando alerta: ' + e.message, 'error');
+            }
+        }
+
+        function testAlertTopic(topic) {
+            document.getElementById('testNtfyTopic').value = topic;
+            testNtfyNotification();
+        }
+
+        async function testNtfyNotification() {
+            const topic = document.getElementById('testNtfyTopic').value;
+            const message = document.getElementById('testNtfyMessage').value;
+
+            if (!topic || !message) {
+                showToast('Ingresa topic y mensaje', 'error');
+                return;
+            }
+
+            try {
+                await API.testAlert(topic, message);
+                showToast('Notificación enviada! Revisa tu app NTFY', 'success');
+            } catch (e) {
+                // Fallback: try sending directly to public NTFY
+                try {
+                    const response = await fetch(`https://ntfy.drozast.xyz/${topic}`, {
+                        method: 'POST',
+                        body: message,
+                        headers: {
+                            'Title': 'Dashboard Test',
+                            'Priority': 'default',
+                            'Tags': 'test,dashboard'
+                        }
+                    });
+
+                    if (response.ok) {
+                        showToast('Notificación enviada (fallback)! Revisa tu app NTFY', 'success');
+                    } else {
+                        showToast('Error enviando notificación', 'error');
+                    }
+                } catch (e2) {
+                    showToast('Error: ' + e.message, 'error');
+                }
+            }
+        }
+
+        // ============ AUDIT LOG ============
+
+        async function loadAuditLog() {
+            try {
+                const data = await API.getAuditLog(50);
+                const logs = data.logs || [];
+
+                const tbody = document.getElementById('auditTable');
+                if (logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay registros</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = logs.map(l => `
+                    <tr>
+                        <td>${l.created_at}</td>
+                        <td>${l.user_email || l.api_key_name || '-'}</td>
+                        <td><span class="badge badge-info">${l.action}</span></td>
+                        <td>${l.container_name || '-'}</td>
+                        <td><small>${l.details || '-'}</small></td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showToast('Error cargando audit log', 'error');
+            }
+        }
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
