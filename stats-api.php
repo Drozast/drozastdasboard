@@ -4,6 +4,40 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
 $energy_file = '/var/www/html/energy_log.json';
+$rapl_cache_file = '/var/www/html/rapl_cache.json';
+
+// CPU power real via RAPL (Intel)
+$cpu_watts_real = null;
+$rapl_path = '/host/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj';
+$rapl_energy = @file_get_contents($rapl_path);
+if ($rapl_energy !== false) {
+    $rapl_energy = (float)trim($rapl_energy);
+    $rapl_now = microtime(true);
+
+    // Leer caché anterior
+    $rapl_cache = @file_get_contents($rapl_cache_file);
+    $rapl_prev = $rapl_cache ? json_decode($rapl_cache, true) : null;
+
+    if ($rapl_prev && isset($rapl_prev['energy']) && isset($rapl_prev['time'])) {
+        $energy_diff = $rapl_energy - $rapl_prev['energy'];
+        $time_diff = $rapl_now - $rapl_prev['time'];
+
+        // Handle counter overflow (max_energy_range_uj)
+        if ($energy_diff < 0) {
+            $max_energy = @file_get_contents('/host/sys/class/powercap/intel-rapl/intel-rapl:0/max_energy_range_uj');
+            if ($max_energy) {
+                $energy_diff = ((float)trim($max_energy) - $rapl_prev['energy']) + $rapl_energy;
+            }
+        }
+
+        if ($time_diff > 0 && $time_diff < 60) { // máximo 60 segundos entre lecturas
+            $cpu_watts_real = round($energy_diff / $time_diff / 1000000, 1); // uJ a W
+        }
+    }
+
+    // Guardar lectura actual
+    @file_put_contents($rapl_cache_file, json_encode(['energy' => $rapl_energy, 'time' => $rapl_now]));
+}
 
 // CPU
 $cpu = (int)trim(shell_exec("grep 'cpu ' /host/proc/stat | awk '{usage=(\$2+\$4)*100/(\$2+\$4+\$5)} END {print int(usage)}'") ?? "0");
@@ -69,6 +103,58 @@ if ($nvidia_check && trim($nvidia_check) !== '') {
             'fan_percent' => (int)trim($gpu_data[6]),
             'clock_mhz' => (int)trim($gpu_data[7]),
             'mem_clock_mhz' => (int)trim($gpu_data[8])
+        ];
+    }
+}
+
+// GPU AMD (si existe) - RX 570, etc.
+if (!$gpu_info) {
+    // Buscar hwmon de AMD GPU
+    $amd_hwmon = trim(shell_exec("ls -d /host/sys/class/drm/card0/device/hwmon/hwmon* 2>/dev/null | head -1") ?? "");
+    $amd_device = "/host/sys/class/drm/card0/device";
+
+    if ($amd_hwmon) {
+        // Temperatura
+        $temp_raw = trim(shell_exec("cat {$amd_hwmon}/temp1_input 2>/dev/null") ?? "0");
+        $temp = $temp_raw ? round((int)$temp_raw / 1000) : 0;
+
+        // Fan RPM
+        $fan_rpm = (int)trim(shell_exec("cat {$amd_hwmon}/fan1_input 2>/dev/null") ?? "0");
+        $fan_max = (int)trim(shell_exec("cat {$amd_hwmon}/fan1_max 2>/dev/null") ?? "4000");
+        $fan_percent = $fan_max > 0 ? round($fan_rpm / $fan_max * 100) : 0;
+
+        // VRAM usado
+        $vram_total = 8192; // RX 570 8GB
+        $vram_used_raw = trim(shell_exec("cat {$amd_device}/mem_info_vram_used 2>/dev/null") ?? "0");
+        $vram_used = $vram_used_raw ? round((int)$vram_used_raw / 1024 / 1024) : 0;
+
+        // Clock actual y máximo para calcular uso
+        $clock_lines = shell_exec("cat {$amd_device}/pp_dpm_sclk 2>/dev/null") ?? "";
+        $clock_mhz = 0;
+        $clock_max = 1268; // RX 570 max boost
+        if (preg_match('/(\d+):\s*(\d+)Mhz\s*\*/', $clock_lines, $m)) {
+            $clock_mhz = (int)$m[2];
+        }
+
+        // Estimar uso basado en clock (300MHz idle, 1268MHz max)
+        $clock_min = 300;
+        $usage = $clock_mhz > $clock_min ? round(($clock_mhz - $clock_min) / ($clock_max - $clock_min) * 100) : 0;
+
+        // Estimar potencia basado en uso (RX 570: 18W idle, 150W TDP)
+        $power_w = round(18 + ($usage / 100 * (150 - 18)), 1);
+
+        $gpu_info = [
+            'name' => 'AMD RX 570 8GB',
+            'usage' => $usage,
+            'mem_used_mb' => $vram_used,
+            'mem_total_mb' => $vram_total,
+            'temp' => $temp,
+            'power_w' => $power_w,
+            'fan_percent' => $fan_percent,
+            'fan_rpm' => $fan_rpm,
+            'clock_mhz' => $clock_mhz,
+            'mem_clock_mhz' => 0,
+            'type' => 'AMD'
         ];
     }
 }
@@ -148,25 +234,42 @@ $docker_images = count($images);
 $processes = (int)trim(shell_exec("ls /host/proc | grep -E '^[0-9]+$' | wc -l") ?? "0");
 
 // Energia REAL con registro por periodos (dia, semana, mes, año)
-// Consumo por componente
-$cpu_base_watts = 35;    // CPU idle
-$cpu_max_watts = 95;     // CPU TDP (ajustar según tu CPU)
-$cpu_watts = round($cpu_base_watts + (($cpu_max_watts - $cpu_base_watts) * $cpu / 100), 1);
-
-// GPU watts (real desde nvidia-smi o estimado)
-$gpu_watts = 0;
-if ($gpu_info && isset($gpu_info['power_w'])) {
-    $gpu_watts = $gpu_info['power_w'];
+// Consumo por componente - CPU
+if ($cpu_watts_real !== null && $cpu_watts_real > 0 && $cpu_watts_real < 300) {
+    // Usar lectura REAL de Intel RAPL
+    $cpu_watts = $cpu_watts_real;
 } else {
-    // Estimación si no hay GPU o no hay lectura
-    $gpu_watts = 15; // GPU integrada o sin GPU
+    // Fallback: estimar basado en TDP (Xeon E5-2696 v4 = 145W TDP)
+    $cpu_base_watts = 35;    // Xeon idle
+    $cpu_max_watts = 145;    // Xeon E5-2696 v4 TDP
+    $cpu_watts = round($cpu_base_watts + (($cpu_max_watts - $cpu_base_watts) * $cpu / 100), 1);
 }
 
-// Placa base, RAM, SSD, ventiladores (estimación)
-$mb_watts = 25;          // Placa base + chipset
-$ram_watts = round($ram_total / 1024 * 3, 1); // ~3W por cada 8GB
-$storage_watts = 8;      // NVMe + HDDs
-$fans_watts = 10;        // Ventiladores
+// GPU watts - intentar obtener lectura REAL de lm-sensors primero
+$gpu_watts = 0;
+$gpu_watts_real = false;
+
+// Buscar potencia real de AMD GPU en lm-sensors
+if (isset($motherboard_info['sensors']['amdgpu-pci-0300']['PPT']['power1_input'])) {
+    $gpu_watts = round($motherboard_info['sensors']['amdgpu-pci-0300']['PPT']['power1_input'], 1);
+    $gpu_watts_real = true;
+} elseif ($gpu_info && isset($gpu_info['power_w']) && $gpu_info['power_w'] > 0) {
+    $gpu_watts = $gpu_info['power_w'];
+} elseif ($gpu_info) {
+    // Fallback: estimar por uso
+    $gpu_idle = 18;
+    $gpu_max = 150;
+    $gpu_usage = $gpu_info['usage'] ?? 0;
+    $gpu_watts = round($gpu_idle + (($gpu_max - $gpu_idle) * $gpu_usage / 100), 1);
+} else {
+    $gpu_watts = 5;
+}
+
+// Placa base, RAM, SSD, ventiladores (estimación realista)
+$mb_watts = 15;          // Placa base + chipset (mini-ITX/mATX típico)
+$ram_watts = round(($ram_total / 1024) / 8 * 3, 1); // ~3W por cada 8GB
+$storage_watts = 5;      // NVMe (HDDs agregan ~5W cada uno)
+$fans_watts = 4;         // 2-3 ventiladores eficientes
 $other_watts = $mb_watts + $ram_watts + $storage_watts + $fans_watts;
 
 // Total actual
@@ -176,7 +279,9 @@ $cost_per_kwh = 295; // CLP Chile
 // Desglose de consumo
 $power_breakdown = [
     'cpu' => $cpu_watts,
+    'cpu_real' => $cpu_watts_real !== null,  // true = RAPL, false = estimado
     'gpu' => $gpu_watts,
+    'gpu_real' => $gpu_watts_real,  // true = lm-sensors, false = estimado
     'motherboard' => $mb_watts,
     'ram' => $ram_watts,
     'storage' => $storage_watts,
@@ -369,39 +474,156 @@ for ($h = 0; $h < 24; $h++) {
 // Conexiones
 $net_connections = (int)trim(shell_exec("cat /host/proc/net/tcp /host/proc/net/tcp6 2>/dev/null | grep -v local_address | wc -l") ?? "0");
 
-// Container Stats (CPU y RAM por contenedor)
+// ==================== PORT SCANNER ====================
+// Escanear puertos usados por Docker y sistema
+$ports_data = [];
+$port_conflicts = [];
+
+// Obtener puertos de contenedores Docker
+$docker_ports_raw = shell_exec("curl -s --unix-socket /var/run/docker.sock 'http://localhost/containers/json' 2>/dev/null") ?? "[]";
+$docker_containers = json_decode($docker_ports_raw, true) ?? [];
+
+foreach ($docker_containers as $container) {
+    $container_name = ltrim($container['Names'][0] ?? 'unknown', '/');
+    $container_ports = $container['Ports'] ?? [];
+
+    foreach ($container_ports as $port_info) {
+        $host_port = $port_info['PublicPort'] ?? null;
+        $container_port = $port_info['PrivatePort'] ?? null;
+        $protocol = $port_info['Type'] ?? 'tcp';
+        $host_ip = $port_info['IP'] ?? '';
+
+        // Solo procesar IPv4 (evitar duplicados por IPv6)
+        if ($host_port && ($host_ip === '0.0.0.0' || $host_ip === '')) {
+            $port_key = "{$host_port}/{$protocol}";
+
+            // Detectar conflictos REALES (diferentes contenedores en el mismo puerto)
+            if (isset($ports_data[$port_key]) && $ports_data[$port_key]['container'] !== $container_name) {
+                $port_conflicts[] = [
+                    'port' => $host_port,
+                    'protocol' => $protocol,
+                    'containers' => [$ports_data[$port_key]['container'], $container_name]
+                ];
+            }
+
+            // Solo guardar si no existe (evitar sobrescribir)
+            if (!isset($ports_data[$port_key])) {
+                $ports_data[$port_key] = [
+                    'port' => $host_port,
+                    'container_port' => $container_port,
+                    'protocol' => $protocol,
+                    'container' => $container_name,
+                    'type' => 'docker'
+                ];
+            }
+        }
+    }
+}
+
+// Agrupar puertos por rango
+$port_ranges = [
+    '2000-2999' => ['name' => 'SSH/Git', 'ports' => [], 'used' => 0],
+    '3000-3999' => ['name' => 'Apps Web', 'ports' => [], 'used' => 0],
+    '4000-4999' => ['name' => 'APIs', 'ports' => [], 'used' => 0],
+    '5000-5999' => ['name' => 'Databases/Services', 'ports' => [], 'used' => 0],
+    '6000-6999' => ['name' => 'Redis/Cache', 'ports' => [], 'used' => 0],
+    '8000-8999' => ['name' => 'HTTP Services', 'ports' => [], 'used' => 0],
+    '9000-9999' => ['name' => 'MinIO/Storage', 'ports' => [], 'used' => 0],
+    '10000+' => ['name' => 'Otros', 'ports' => [], 'used' => 0]
+];
+
+foreach ($ports_data as $port_key => $port_info) {
+    $port = $port_info['port'];
+    $range_key = '10000+';
+
+    if ($port >= 2000 && $port <= 2999) $range_key = '2000-2999';
+    elseif ($port >= 3000 && $port <= 3999) $range_key = '3000-3999';
+    elseif ($port >= 4000 && $port <= 4999) $range_key = '4000-4999';
+    elseif ($port >= 5000 && $port <= 5999) $range_key = '5000-5999';
+    elseif ($port >= 6000 && $port <= 6999) $range_key = '6000-6999';
+    elseif ($port >= 8000 && $port <= 8999) $range_key = '8000-8999';
+    elseif ($port >= 9000 && $port <= 9999) $range_key = '9000-9999';
+
+    $port_ranges[$range_key]['ports'][] = $port_info;
+    $port_ranges[$range_key]['used']++;
+}
+
+// Calcular porcentaje de uso por rango (asumiendo 100 puertos disponibles por rango)
+foreach ($port_ranges as $key => &$range) {
+    $range['percent'] = min(100, round($range['used'] / 100 * 100));
+    // Ordenar puertos por número
+    usort($range['ports'], function($a, $b) {
+        return $a['port'] - $b['port'];
+    });
+}
+unset($range);
+
+// Función para sugerir siguiente puerto disponible en un rango
+$suggest_port = function($range_start, $range_end) use ($ports_data) {
+    for ($p = $range_start; $p <= $range_end; $p++) {
+        if (!isset($ports_data["{$p}/tcp"])) {
+            return $p;
+        }
+    }
+    return null;
+};
+
+$suggested_ports = [
+    'web' => $suggest_port(3000, 3999),
+    'api' => $suggest_port(4000, 4999),
+    'database' => $suggest_port(5432, 5499),
+    'redis' => $suggest_port(6379, 6399),
+    'http' => $suggest_port(8000, 8999),
+    'minio' => $suggest_port(9000, 9099)
+];
+
+// ==================== END PORT SCANNER ====================
+
+// Container Stats (CPU y RAM por contenedor) - Solo contenedores importantes
 $container_stats = [];
-$stats_raw = shell_exec("curl -s --unix-socket /var/run/docker.sock 'http://localhost/containers/json' 2>/dev/null") ?? "[]";
+// Incluir size=true para obtener tamaño del contenedor
+$stats_raw = shell_exec("curl -s --max-time 5 --unix-socket /var/run/docker.sock 'http://localhost/containers/json?size=true' 2>/dev/null") ?? "[]";
 $running_containers = json_decode($stats_raw, true) ?? [];
+
+// Solo obtener stats de contenedores que se muestran en el dashboard
+$important_containers = ['wolf-gaming', 'nextcloud', 'immich', 'jellyfin', 'audiobookshelf',
+    'plex', 'vaultwarden', 'homeassistant', 'adguard', 'nginx-proxy-manager', 'portainer'];
 
 foreach ($running_containers as $container) {
     $name = ltrim($container['Names'][0] ?? 'unknown', '/');
     $id = substr($container['Id'], 0, 12);
     $status = $container['State'] ?? 'unknown';
+    $size_root = $container['SizeRootFs'] ?? 0;  // Tamaño total del contenedor
+    $size_rw = $container['SizeRw'] ?? 0;        // Tamaño de la capa escribible
 
-    // Get individual container stats
-    $stat_raw = shell_exec("curl -s --unix-socket /var/run/docker.sock 'http://localhost/containers/$id/stats?stream=false' 2>/dev/null");
-    $stat = json_decode($stat_raw, true);
+    // Solo obtener stats detalladas para contenedores importantes o Wolf
+    $is_important = in_array($name, $important_containers) || stripos($name, 'wolf') !== false;
 
     $cpu_percent = 0;
     $mem_percent = 0;
     $mem_usage = 0;
     $mem_limit = 0;
 
-    if ($stat) {
-        // CPU calculation
-        $cpu_delta = ($stat['cpu_stats']['cpu_usage']['total_usage'] ?? 0) - ($stat['precpu_stats']['cpu_usage']['total_usage'] ?? 0);
-        $system_delta = ($stat['cpu_stats']['system_cpu_usage'] ?? 0) - ($stat['precpu_stats']['system_cpu_usage'] ?? 0);
-        $cpu_count = $stat['cpu_stats']['online_cpus'] ?? 1;
+    if ($is_important) {
+        // Get individual container stats con timeout de 2 segundos
+        $stat_raw = shell_exec("curl -s --max-time 2 --unix-socket /var/run/docker.sock 'http://localhost/containers/$id/stats?stream=false' 2>/dev/null");
+        $stat = json_decode($stat_raw, true);
 
-        if ($system_delta > 0 && $cpu_delta > 0) {
-            $cpu_percent = round(($cpu_delta / $system_delta) * $cpu_count * 100, 2);
+        if ($stat) {
+            // CPU calculation
+            $cpu_delta = ($stat['cpu_stats']['cpu_usage']['total_usage'] ?? 0) - ($stat['precpu_stats']['cpu_usage']['total_usage'] ?? 0);
+            $system_delta = ($stat['cpu_stats']['system_cpu_usage'] ?? 0) - ($stat['precpu_stats']['system_cpu_usage'] ?? 0);
+            $cpu_count = $stat['cpu_stats']['online_cpus'] ?? 1;
+
+            if ($system_delta > 0 && $cpu_delta > 0) {
+                $cpu_percent = round(($cpu_delta / $system_delta) * $cpu_count * 100, 2);
+            }
+
+            // Memory calculation
+            $mem_usage = $stat['memory_stats']['usage'] ?? 0;
+            $mem_limit = $stat['memory_stats']['limit'] ?? 1;
+            $mem_percent = round(($mem_usage / $mem_limit) * 100, 2);
         }
-
-        // Memory calculation
-        $mem_usage = $stat['memory_stats']['usage'] ?? 0;
-        $mem_limit = $stat['memory_stats']['limit'] ?? 1;
-        $mem_percent = round(($mem_usage / $mem_limit) * 100, 2);
     }
 
     $container_stats[$name] = [
@@ -410,7 +632,9 @@ foreach ($running_containers as $container) {
         'cpu_percent' => $cpu_percent,
         'mem_percent' => $mem_percent,
         'mem_usage_mb' => round($mem_usage / 1024 / 1024, 1),
-        'mem_limit_mb' => round($mem_limit / 1024 / 1024, 1)
+        'mem_limit_mb' => round($mem_limit / 1024 / 1024, 1),
+        'size_mb' => round($size_root / 1024 / 1024, 1),
+        'size_rw_mb' => round($size_rw / 1024 / 1024, 1)
     ];
 }
 
@@ -454,5 +678,12 @@ echo json_encode([
     ],
     'gpu' => $gpu_info,
     'motherboard' => $motherboard_info,
-    'container_stats' => $container_stats
+    'container_stats' => $container_stats,
+    'ports' => [
+        'all' => array_values($ports_data),
+        'by_range' => $port_ranges,
+        'conflicts' => $port_conflicts,
+        'total_used' => count($ports_data),
+        'suggested' => $suggested_ports
+    ]
 ]);
